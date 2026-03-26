@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Editor</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #1a1a1a; --surface: #222; --surface2: #2a2a2a; --border: #333;
+    --accent: #c8a96e; --accent2: #8b6f47; --text: #e8e4dc; --muted: #888; --danger: #c0392b;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; font-size: 13px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; height: 44px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .logo { color: var(--accent); font-size: 13px; letter-spacing: 0.08em; }
+  .tab-bar { display: flex; gap: 2px; }
+  .tab { padding: 4px 12px; font-size: 11px; letter-spacing: 0.06em; color: var(--muted); cursor: pointer; border: 1px solid transparent; border-radius: 3px; background: none; font-family: 'Courier New', monospace; }
+  .tab.active { color: var(--accent); border-color: var(--border); background: var(--bg); }
+  .tab:hover:not(.active) { color: var(--text); }
+  .topbar-right { display: flex; gap: 8px; align-items: center; }
+  .btn { padding: 5px 14px; font-size: 11px; font-family: 'Courier New', monospace; letter-spacing: 0.06em; cursor: pointer; border-radius: 3px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); }
+  .btn:hover { color: var(--text); border-color: var(--muted); }
+  .btn-primary { background: var(--accent2); color: #f5ede0; border-color: var(--accent); }
+  .btn-primary:hover { background: var(--accent); color: #1a1a1a; }
+  .saved-badge { font-size: 10px; color: #5a9; letter-spacing: 0.06em; opacity: 0; transition: opacity 0.4s; }
+  .saved-badge.show { opacity: 1; }
+  .workspace { display: flex; flex: 1; overflow: hidden; }
+  .editor-panel { width: 360px; flex-shrink: 0; border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .section-tabs { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; }
+  .section-tabs::-webkit-scrollbar { height: 3px; }
+  .section-tabs::-webkit-scrollbar-thumb { background: var(--border); }
+  .stab { padding: 8px 14px; font-size: 10px; letter-spacing: 0.08em; color: var(--muted); cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; flex-shrink: 0; }
+  .stab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .stab:hover:not(.active) { color: var(--text); }
+  .editor-scroll { flex: 1; overflow-y: auto; padding: 16px; }
+  .editor-scroll::-webkit-scrollbar { width: 4px; }
+  .editor-scroll::-webkit-scrollbar-thumb { background: var(--border); }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 10px; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 5px; }
+  .field input, .field textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    font-family: 'Courier New', monospace; font-size: 12px; padding: 7px 9px; border-radius: 3px; outline: none;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--accent2); }
+  .field textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .section-divider { font-size: 10px; letter-spacing: 0.12em; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 14px; margin-top: 4px; }
+  .list-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 10px 12px; margin-bottom: 8px; }
+  .list-item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .list-item-title { font-size: 11px; color: var(--accent); }
+  .list-item-actions { display: flex; gap: 4px; }
+  .icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; padding: 2px 4px; font-family: 'Courier New', monospace; }
+  .icon-btn:hover { color: var(--danger); }
+  .icon-btn.move:hover { color: var(--text); }
+  .add-btn { width: 100%; padding: 7px; font-size: 11px; font-family: 'Courier New', monospace; letter-spacing: 0.06em; background: none; border: 1px dashed var(--border); color: var(--muted); cursor: pointer; border-radius: 3px; margin-top: 4px; }
+  .add-btn:hover { border-color: var(--accent2); color: var(--accent); }
+  .photo-drop { width: 100%; height: 130px; border: 1.5px dashed var(--border); border-radius: 3px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 6px; transition: border-color 0.15s; position: relative; overflow: hidden; background: var(--bg); }
+  .photo-drop:hover { border-color: var(--accent2); }
+  .photo-drop.has-photo { border-style: solid; border-color: var(--accent2); }
+  .photo-drop img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-drop .photo-label { font-size: 10px; letter-spacing: 0.08em; color: var(--muted); }
+  .photo-drop .photo-icon { font-size: 20px; color: var(--muted); }
+  .photo-drop input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .photo-actions { display: flex; gap: 6px; margin-top: 6px; }
+  .photo-actions button { flex: 1; padding: 5px; font-size: 10px; font-family: 'Courier New', monospace; letter-spacing: 0.06em; background: none; border: 1px solid var(--border); color: var(--muted); cursor: pointer; border-radius: 3px; }
+  .photo-actions button:hover { color: var(--text); border-color: var(--muted); }
+  .photo-actions button.danger:hover { color: var(--danger); border-color: var(--danger); }
+  .preview-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .preview-topbar { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
+  .preview-label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); }
+  .preview-url { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 4px 10px; font-size: 11px; color: var(--muted); }
+  .preview-frame { flex: 1; overflow: hidden; }
+  .preview-frame iframe { width: 100%; height: 100%; border: none; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  #loginScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+  .login-box { border: 1px solid var(--border); padding: 36px 32px; width: 320px; background: var(--surface); border-radius: 4px; }
+  .login-title { color: var(--accent); font-size: 13px; letter-spacing: 0.1em; margin-bottom: 28px; }
+  .login-label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); display: block; margin-bottom: 5px; }
+  .login-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'Courier New', monospace; font-size: 12px; padding: 8px 10px; border-radius: 3px; outline: none; margin-bottom: 14px; }
+  .login-input:focus { border-color: var(--accent2); }
+  .login-btn { width: 100%; padding: 9px; font-size: 11px; font-family: 'Courier New', monospace; letter-spacing: 0.08em; cursor: pointer; border-radius: 3px; border: 1px solid var(--accent); background: var(--accent2); color: #f5ede0; margin-top: 6px; }
+  .login-btn:hover { background: var(--accent); color: #1a1a1a; }
+  .login-error { color: #c0392b; font-size: 10px; letter-spacing: 0.06em; margin-top: 10px; min-height: 14px; text-align: center; }
+  #appShell { display: none; flex-direction: column; height: 100vh; overflow: hidden; }
+  #appShell.visible { display: flex; }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-title">// PORTFOLIO EDITOR · ACCESS REQUIRED</div>
+    <label class="login-label">USERNAME</label>
+    <input class="login-input" id="loginUser" type="text" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')doLogin()">
+    <label class="login-label">PASSWORD</label>
+    <input class="login-input" id="loginPass" type="password" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">AUTHENTICATE</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<div id="appShell">
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">// PORTFOLIO EDITOR</span>
+    <div class="tab-bar">
+      <button class="tab active" onclick="setMode('edit', this)">EDIT</button>
+      <button class="tab" onclick="setMode('preview', this)">PREVIEW</button>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="saved-badge" id="savedBadge">checkmark SAVED</span>
+    <button class="btn" onclick="saveToStorage()">SAVE</button>
+    <button class="btn btn-primary" onclick="exportHTML()">EXPORT HTML</button>
+  </div>
+</div>
+
+<div class="workspace">
+  <div class="editor-panel" id="editorPanel">
+    <div class="section-tabs">
+      <div class="stab active" onclick="showSection('identity', this)">IDENTITY</div>
+      <div class="stab" onclick="showSection('posts', this)">POSTS</div>
+      <div class="stab" onclick="showSection('research', this)">RESEARCH</div>
+      <div class="stab" onclick="showSection('cves', this)">CVEs</div>
+      <div class="stab" onclick="showSection('talks', this)">TALKS</div>
+      <div class="stab" onclick="showSection('links', this)">LINKS</div>
+      <div class="stab" onclick="showSection('contact', this)">CONTACT</div>
+    </div>
+    <div class="editor-scroll" id="editorContent"></div>
+  </div>
+  <div class="preview-panel">
+    <div class="preview-topbar">
+      <span class="preview-label">LIVE PREVIEW</span>
+      <div class="preview-url">portfolio.html</div>
+    </div>
+    <div class="preview-frame">
+      <iframe id="previewFrame"></iframe>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+var D = null;
+var currentSection = 'identity';
+
+var _u = 'LostSignals';
+var _p = 'B1cycl3s';
+
+function doLogin() {
+  var u = document.getElementById('loginUser').value;
+  var p = document.getElementById('loginPass').value;
+  var err = document.getElementById('loginError');
+  if (u === _u && p === _p) {
+    sessionStorage.setItem('auth', '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').classList.add('visible');
+    loadData();
+    renderSection();
+    rp();
+  } else {
+    err.textContent = 'ACCESS DENIED — invalid credentials';
+    document.getElementById('loginPass').value = '';
+    setTimeout(function() { err.textContent = ''; }, 3000);
+  }
+}
+
+function checkAuth() {
+  if (sessionStorage.getItem('auth') === '1') {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').classList.add('visible');
+    return true;
+  }
+  setTimeout(function() {
+    document.getElementById('loginUser').focus();
+  }, 100);
+  return false;
+}
+
+var DEFAULTS = {
+  name: "Alex Chen",
+  tagline: "vulnerability researcher · exploit engineer · occasional writer",
+  bio: "I find security bugs for a living. Sometimes in browsers, sometimes in kernels, once in a SCADA system that probably shouldn't have been connected to the internet.\n\nCurrently at NCC Group. Previously Google Project Zero. I have a newsletter that three people read and a GitHub that's more useful.",
+  stats: "14 CVEs filed\n$96k in bounties\n53 CTF wins\n3x DEF CON speaker\nPwn2Own 25 champion",
+  pgp: "0xDEADC0DE",
+  email: "alex [at] chen.io",
+  contactNote: "PGP preferred.\nNo recruiters.\nNo collab requests.",
+  footerLeft: "alex chen · security research · est. 2017",
+  footerRight: "no cookies · no trackers · just html",
+  posts: [
+    { title: "HTTP/2 Rapid Reset: What everyone got wrong", date: "20 march 2026", readtime: "8 min read", body: "Most coverage focused on DDoS. Nobody talked about why the protocol ambiguity existed in the first place, or what it says about spec-by-committee design.", tags: "http2, cve, protocol-design", url: "#" },
+    { title: "Your EDR probably missed it: syscall unhooking in 2026", date: "11 march 2026", readtime: "12 min read", body: "I tested 11 major EDR products against direct syscall techniques. The results are not flattering.", tags: "edr, windows, red-team", url: "#" },
+    { title: "Notes from Pwn2Own Automotive 2025", date: "28 jan 2026", readtime: "6 min read", body: "We won. Here is what I can talk about publicly, and why the automotive attack surface is in a worse state than manufacturers want to admit.", tags: "pwn2own, automotive, embedded", url: "#" }
+  ],
+  research: [
+    { title: "Confusion Attacks: Exploiting ambiguity in web standards", venue: "Black Hat USA 2024", links: "slides, paper", body: "A systematic study of cases where two parties read the same spec and reach different conclusions and how attackers exploit the gap." },
+    { title: "DNS-over-HTTPS as a covert C2 channel", venue: "published march 2025", links: "code", body: "PoC implementation and detection guidance. Built to understand the defensive blind spots." }
+  ],
+  cves: [
+    { id: "CVE-2024-38112", desc: "Windows MSHTML Platform spoofing, CVSS 9.8", url: "#" },
+    { id: "CVE-2024-21413", desc: "Microsoft Outlook Moniker Link RCE, CVSS 9.8", url: "#" },
+    { id: "CVE-2023-44487", desc: "HTTP/2 Rapid Reset Attack, CVSS 7.5", url: "#" },
+    { id: "CVE-2022-30190", desc: "Microsoft Follina MSDT RCE, CVSS 7.8", url: "#" }
+  ],
+  talks: [
+    { title: "When your EDR becomes your enemy", event: "DEF CON 33", year: "2025", url: "#" },
+    { title: "Confusion Attacks at scale", event: "Black Hat USA", year: "2024", url: "#" },
+    { title: "Exploiting the Unexploitable", event: "DEF CON 31", year: "2023", url: "#" },
+    { title: "Modern browser exploitation techniques", event: "OffensiveCon", year: "2022", url: "#" }
+  ],
+  links: [
+    { label: "GitHub", url: "#" },
+    { label: "HackTheBox", url: "#" },
+    { label: "Google Scholar", url: "#" },
+    { label: "RSS feed", url: "#" }
+  ]
+};
+
+function loadData() {
+  try {
+    var saved = localStorage.getItem('portfolio_data');
+    if (saved) { D = JSON.parse(saved); return; }
+  } catch(e) {}
+  D = JSON.parse(JSON.stringify(DEFAULTS));
+}
+
+function esc(s) {
+  if (s === undefined || s === null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function showSection(name, el) {
+  currentSection = name;
+  var tabs = document.querySelectorAll('.stab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+  if (el) el.classList.add('active');
+  renderSection();
+}
+
+function renderSection() {
+  var el = document.getElementById('editorContent');
+  if (!el) return;
+  var html = '';
+  if (currentSection === 'identity')  html = buildIdentity();
+  else if (currentSection === 'posts')     html = buildList('posts');
+  else if (currentSection === 'research')  html = buildList('research');
+  else if (currentSection === 'cves')      html = buildList('cves');
+  else if (currentSection === 'talks')     html = buildList('talks');
+  else if (currentSection === 'links')     html = buildList('links');
+  else if (currentSection === 'contact')   html = buildContact();
+  el.innerHTML = html;
+}
+
+function mkField(label, type, val, cb, rows) {
+  if (type === 'textarea') {
+    return '<div class="field"><label>' + label + '</label><textarea rows="' + (rows||4) + '" oninput="' + cb + '">' + esc(val) + '</textarea></div>';
+  }
+  return '<div class="field"><label>' + label + '</label><input value="' + esc(val) + '" oninput="' + cb + '"></div>';
+}
+
+function buildIdentity() {
+  var photoInner = D.photo
+    ? '<img src="' + D.photo + '" alt="profile photo"><input type="file" accept="image/*" onchange="handlePhoto(event)">'
+    : '<span class="photo-icon">[ img ]</span><span class="photo-label">click or drag to upload</span><input type="file" accept="image/*" onchange="handlePhoto(event)">';
+  var photoClass = D.photo ? 'photo-drop has-photo' : 'photo-drop';
+  return '<div class="section-divider">IDENTITY</div>' +
+    mkField('NAME', 'input', D.name, 'D.name=this.value;rp()') +
+    mkField('TAGLINE', 'input', D.tagline, 'D.tagline=this.value;rp()') +
+    mkField('BIO', 'textarea', D.bio, 'D.bio=this.value;rp()', 6) +
+    '<div class="section-divider" style="margin-top:18px">PHOTO</div>' +
+    '<div class="field"><label>PROFILE PHOTO (embedded into exported HTML)</label>' +
+    '<div class="' + photoClass + '" id="photoDrop" ondragover="event.preventDefault()" ondrop="handlePhotoDrop(event)">' + photoInner + '</div>' +
+    '<div class="photo-actions">' +
+    '<button onclick="document.querySelector(\'#photoDrop input\').click()">UPLOAD NEW</button>' +
+    '<button class="danger" onclick="removePhoto()">REMOVE</button>' +
+    '</div></div>' +
+    '<div class="section-divider" style="margin-top:18px">SIDEBAR STATS</div>' +
+    mkField('STATS (one per line)', 'textarea', D.stats, 'D.stats=this.value;rp()', 6) +
+    mkField('PGP KEY', 'input', D.pgp, 'D.pgp=this.value;rp()') +
+    '<div class="section-divider" style="margin-top:18px">FOOTER</div>' +
+    mkField('FOOTER LEFT', 'input', D.footerLeft, 'D.footerLeft=this.value;rp()') +
+    mkField('FOOTER RIGHT', 'input', D.footerRight, 'D.footerRight=this.value;rp()');
+}
+
+function handlePhoto(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  readPhotoFile(file);
+}
+
+function handlePhotoDrop(event) {
+  event.preventDefault();
+  var file = event.dataTransfer.files[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  readPhotoFile(file);
+}
+
+function readPhotoFile(file) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    D.photo = e.target.result;
+    renderSection();
+    rp();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  D.photo = '';
+  renderSection();
+  rp();
+}
+
+function buildContact() {
+  return '<div class="section-divider">CONTACT</div>' +
+    mkField('EMAIL', 'input', D.email, 'D.email=this.value;rp()') +
+    mkField('PGP KEY', 'input', D.pgp, 'D.pgp=this.value;rp()') +
+    mkField('CONTACT NOTE', 'textarea', D.contactNote, 'D.contactNote=this.value;rp()', 5);
+}
+
+var LIST_CONFIGS = {
+  posts: {
+    label: 'BLOG POSTS', btnLabel: '+ ADD POST',
+    itemTitle: function(p, i) { return 'POST ' + (i+1); },
+    fields: function(i) {
+      return mkField('TITLE', 'input', D.posts[i].title, 'D.posts[' + i + '].title=this.value;rp()') +
+        '<div class="field-row">' +
+        mkField('DATE', 'input', D.posts[i].date, 'D.posts[' + i + '].date=this.value;rp()') +
+        mkField('READ TIME', 'input', D.posts[i].readtime, 'D.posts[' + i + '].readtime=this.value;rp()') +
+        '</div>' +
+        mkField('EXCERPT', 'textarea', D.posts[i].body, 'D.posts[' + i + '].body=this.value;rp()', 3) +
+        mkField('TAGS', 'input', D.posts[i].tags, 'D.posts[' + i + '].tags=this.value;rp()') +
+        mkField('URL', 'input', D.posts[i].url, 'D.posts[' + i + '].url=this.value;rp()');
+    }
+  },
+  research: {
+    label: 'SELECTED RESEARCH', btnLabel: '+ ADD RESEARCH',
+    itemTitle: function(r, i) { return 'PAPER ' + (i+1); },
+    fields: function(i) {
+      return mkField('TITLE', 'input', D.research[i].title, 'D.research[' + i + '].title=this.value;rp()') +
+        '<div class="field-row">' +
+        mkField('VENUE', 'input', D.research[i].venue, 'D.research[' + i + '].venue=this.value;rp()') +
+        mkField('LINKS', 'input', D.research[i].links, 'D.research[' + i + '].links=this.value;rp()') +
+        '</div>' +
+        mkField('DESCRIPTION', 'textarea', D.research[i].body, 'D.research[' + i + '].body=this.value;rp()', 3);
+    }
+  },
+  cves: {
+    label: 'CVEs', btnLabel: '+ ADD CVE',
+    itemTitle: function(c, i) { return c.id || ('CVE ' + (i+1)); },
+    fields: function(i) {
+      return '<div class="field-row">' +
+        mkField('CVE ID', 'input', D.cves[i].id, 'D.cves[' + i + '].id=this.value;rp();renderSection()') +
+        mkField('URL', 'input', D.cves[i].url, 'D.cves[' + i + '].url=this.value;rp()') +
+        '</div>' +
+        mkField('DESCRIPTION', 'input', D.cves[i].desc, 'D.cves[' + i + '].desc=this.value;rp()');
+    }
+  },
+  talks: {
+    label: 'TALKS', btnLabel: '+ ADD TALK',
+    itemTitle: function(t, i) { return 'TALK ' + (i+1); },
+    fields: function(i) {
+      return mkField('TITLE', 'input', D.talks[i].title, 'D.talks[' + i + '].title=this.value;rp()') +
+        '<div class="field-row">' +
+        mkField('EVENT', 'input', D.talks[i].event, 'D.talks[' + i + '].event=this.value;rp()') +
+        mkField('YEAR', 'input', D.talks[i].year, 'D.talks[' + i + '].year=this.value;rp()') +
+        '</div>' +
+        mkField('URL', 'input', D.talks[i].url, 'D.talks[' + i + '].url=this.value;rp()');
+    }
+  },
+  links: {
+    label: 'SIDEBAR LINKS', btnLabel: '+ ADD LINK',
+    itemTitle: function(l, i) { return l.label || ('LINK ' + (i+1)); },
+    fields: function(i) {
+      return '<div class="field-row">' +
+        mkField('LABEL', 'input', D.links[i].label, 'D.links[' + i + '].label=this.value;rp();renderSection()') +
+        mkField('URL', 'input', D.links[i].url, 'D.links[' + i + '].url=this.value;rp()') +
+        '</div>';
+    }
+  }
+};
+
+function buildList(key) {
+  var cfg = LIST_CONFIGS[key];
+  var html = '<div class="section-divider">' + cfg.label + '</div>';
+  for (var i = 0; i < D[key].length; i++) {
+    var item = D[key][i];
+    html += '<div class="list-item">' +
+      '<div class="list-item-head">' +
+      '<span class="list-item-title">' + esc(cfg.itemTitle(item, i)) + '</span>' +
+      '<div class="list-item-actions">' +
+      '<button class="icon-btn move" onclick="moveItem(\'' + key + '\',' + i + ',-1)">&#8593;</button>' +
+      '<button class="icon-btn move" onclick="moveItem(\'' + key + '\',' + i + ',1)">&#8595;</button>' +
+      '<button class="icon-btn" onclick="removeItem(\'' + key + '\',' + i + ')">&#10005;</button>' +
+      '</div></div>' +
+      cfg.fields(i) +
+      '</div>';
+  }
+  html += '<button class="add-btn" onclick="addItem(\'' + key + '\')">' + cfg.btnLabel + '</button>';
+  return html;
+}
+
+var NEW_ITEM = {
+  posts:    { title: 'New Post', date: '', readtime: '', body: '', tags: '', url: '#' },
+  research: { title: 'New Paper', venue: '', links: '', body: '' },
+  cves:     { id: 'CVE-XXXX-XXXXX', desc: '', url: '#' },
+  talks:    { title: 'New Talk', event: '', year: '', url: '#' },
+  links:    { label: 'New Link', url: '#' }
+};
+
+function addItem(key) {
+  D[key].push(JSON.parse(JSON.stringify(NEW_ITEM[key])));
+  renderSection(); rp();
+}
+function removeItem(key, i) {
+  D[key].splice(i, 1);
+  renderSection(); rp();
+}
+function moveItem(key, i, dir) {
+  var j = i + dir;
+  if (j < 0 || j >= D[key].length) return;
+  var tmp = D[key][i]; D[key][i] = D[key][j]; D[key][j] = tmp;
+  renderSection(); rp();
+}
+
+function buildHTML(d) {
+  var statsLines = (d.stats || '').split('\n').filter(Boolean).map(function(l) { return esc(l) + '<br>'; }).join('');
+  var bioLines   = (d.bio || '').split('\n\n').map(function(p) { return '<p>' + esc(p) + '</p>'; }).join('');
+  var contactLines = (d.contactNote || '').split('\n').map(function(l) { return esc(l); }).join('<br>');
+  var updated = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+  var postsHTML = d.posts.map(function(p) {
+    return '<div class="entry"><div class="entry-title"><a href="' + esc(p.url) + '">' + esc(p.title) + '</a></div>' +
+      '<div class="entry-meta">' + esc(p.date) + (p.readtime ? ' &middot; ' + esc(p.readtime) : '') + '</div>' +
+      '<div class="entry-body">' + esc(p.body) + '</div>' +
+      (p.tags ? '<div class="entry-tags">[ ' + esc(p.tags) + ' ]</div>' : '') +
+      '</div><hr class="soft">';
+  }).join('');
+
+  var researchHTML = d.research.map(function(r) {
+    var lnks = r.links ? ' &middot; ' + r.links.split(',').map(function(l) { return '<a href="#">' + esc(l.trim()) + '</a>'; }).join(' &middot; ') : '';
+    return '<div class="entry"><div class="entry-title"><a href="#">' + esc(r.title) + '</a></div>' +
+      '<div class="entry-meta">' + esc(r.venue) + lnks + '</div>' +
+      '<div class="entry-body">' + esc(r.body) + '</div></div><hr class="soft">';
+  }).join('');
+
+  var cvesHTML = d.cves.map(function(c) {
+    return '<span class="cve-pill"><a href="' + esc(c.url) + '" title="' + esc(c.desc) + '" style="color:inherit;text-decoration:none;">' + esc(c.id) + '</a></span><br>';
+  }).join('');
+
+  var talksHTML = d.talks.map(function(t) {
+    return '<a href="' + esc(t.url) + '">' + esc(t.event) + ' &mdash; ' + esc(t.year) + '</a>';
+  }).join('');
+
+  var linksHTML = d.links.map(function(l) {
+    return '<a href="' + esc(l.url) + '">' + esc(l.label) + '</a>';
+  }).join('');
+
+  var css = '*{box-sizing:border-box;margin:0;padding:0}' +
+    ':root{--cream:#f2ede4;--dark:#1a1a1a;--border:#d4cfc6;--accent:#5a2d0c;--surface:#ebe5d8}' +
+    'body{background:var(--cream);font-family:Georgia,serif;color:var(--dark);font-size:14px;line-height:1.75}' +
+    'a{color:var(--accent)}a:hover{color:#b34700}' +
+    '.top-strip{background:var(--dark);color:var(--cream);font-family:"Courier New",monospace;font-size:11px;padding:5px 20px;letter-spacing:.06em;display:flex;justify-content:space-between}' +
+    '.hero{padding:32px 28px 0;display:grid;grid-template-columns:1fr 140px;gap:24px;align-items:start}' +
+    '.hero-name{font-size:38px;font-weight:700;letter-spacing:-1px;margin:0 0 2px;line-height:1.1}' +
+    '.hero-sub{font-family:"Courier New",monospace;font-size:12px;color:#666;margin-bottom:18px;letter-spacing:.04em}' +
+    '.hero-bio p{font-size:14px;margin-bottom:.8rem}' +
+    '.hero-aside{border:1.5px dashed #bbb;padding:12px;background:var(--surface);font-family:"Courier New",monospace;font-size:11px;color:#555;line-height:1.6}' +
+    '.aside-head{font-size:10px;letter-spacing:.1em;color:#999;margin-bottom:6px}' +
+    '.divline{border:none;border-top:1.5px solid var(--dark);margin:20px 28px 0}' +
+    '.body{display:grid;grid-template-columns:58px 1fr 200px}' +
+    '.rotlabel{writing-mode:vertical-rl;transform:rotate(180deg);font-family:"Courier New",monospace;font-size:10px;letter-spacing:.14em;color:#aaa;padding:24px 14px;border-right:1px solid var(--border);text-align:center}' +
+    '.main{padding:22px 24px;border-right:1px solid var(--border)}' +
+    '.section-label{font-family:"Courier New",monospace;font-size:10px;letter-spacing:.14em;color:#999;margin-bottom:12px;padding-bottom:4px;border-bottom:1px solid var(--border)}' +
+    '.entry{margin-bottom:18px}.entry-title{font-size:15px;font-weight:700;margin-bottom:2px}' +
+    '.entry-title a{text-decoration:none;color:var(--dark)}.entry-title a:hover{color:var(--accent)}' +
+    '.entry-meta{font-family:"Courier New",monospace;font-size:11px;color:#888;margin-bottom:6px}' +
+    '.entry-body{font-size:13px;color:#333}.entry-tags{font-family:"Courier New",monospace;font-size:10px;color:#aaa;margin-top:5px}' +
+    'hr.soft{border:none;border-top:1px solid #ddd;margin:16px 0}' +
+    '.panel{padding:20px 16px;font-size:12px}.panel-block{margin-bottom:20px}' +
+    '.panel-head{font-family:"Courier New",monospace;font-size:10px;letter-spacing:.12em;color:#999;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:8px}' +
+    '.panel-block a{display:block;color:var(--accent);text-decoration:none;margin-bottom:3px;font-size:12px;font-family:Georgia,serif}' +
+    '.panel-block a:hover{text-decoration:underline}.panel-note{font-size:11px;color:#888;font-family:"Courier New",monospace;line-height:1.5}' +
+    '.cve-pill{display:inline-block;font-family:"Courier New",monospace;font-size:10px;border:1px solid #bbb;padding:1px 6px;margin-bottom:3px;color:#555}' +
+    '.footer{border-top:1.5px solid var(--dark);padding:10px 28px;display:flex;justify-content:space-between;font-family:"Courier New",monospace;font-size:10px;color:#aaa;letter-spacing:.04em}';
+
+  return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">\n' +
+    '<title>' + esc(d.name) + ' - Security Research</title>\n' +
+    '<style>' + css + '</style>\n</head>\n<body>\n' +
+    '<div class="top-strip"><span>' + esc(d.name).toUpperCase() + ' :: SECURITY RESEARCH</span><span>last updated: ' + updated + '</span></div>\n' +
+    '<div class="hero"><div>' +
+    '<div class="hero-name">' + esc(d.name) + '.</div>' +
+    '<div class="hero-sub">// ' + esc(d.tagline) + '</div>' +
+    '<div class="hero-bio">' + bioLines + '</div></div>' +
+    '<div class="hero-aside">' +
+    (d.photo ? '<img src="' + d.photo + '" alt="profile photo" style="width:100%;display:block;margin-bottom:10px;border:1px solid #ccc;">' : '') +
+    '<div class="aside-head">QUICK STATS</div>' + statsLines + '<br>PGP: <a href="#">' + esc(d.pgp) + '</a></div></div>\n' +
+    '<hr class="divline">\n' +
+    '<div class="body"><div class="rotlabel">CONTENTS</div><div class="main">' +
+    (d.posts.length ? '<div class="section-label">RECENT WRITING</div>' + postsHTML : '') +
+    (d.research.length ? '<div class="section-label" style="margin-top:24px">SELECTED RESEARCH</div>' + researchHTML : '') +
+    '</div><div class="panel">' +
+    (d.cves.length ? '<div class="panel-block"><div class="panel-head">CVEs</div>' + cvesHTML + '</div>' : '') +
+    (d.talks.length ? '<div class="panel-block"><div class="panel-head">TALKS</div>' + talksHTML + '</div>' : '') +
+    (d.links.length ? '<div class="panel-block"><div class="panel-head">ELSEWHERE</div>' + linksHTML + '</div>' : '') +
+    '<div class="panel-block"><div class="panel-head">CONTACT</div>' +
+    '<div class="panel-note">' + esc(d.email) + '<br>' + contactLines + '</div></div>' +
+    '</div></div>\n' +
+    '<div class="footer"><span>' + esc(d.footerLeft) + '</span><span>' + esc(d.footerRight) + '</span></div>\n' +
+    '</body>\n</html>';
+}
+
+var rpTimer;
+function rp() {
+  clearTimeout(rpTimer);
+  rpTimer = setTimeout(function() {
+    var frame = document.getElementById('previewFrame');
+    if (frame) frame.srcdoc = buildHTML(D);
+  }, 150);
+}
+
+function saveToStorage() {
+  try { localStorage.setItem('portfolio_data', JSON.stringify(D)); } catch(e) {}
+  var badge = document.getElementById('savedBadge');
+  badge.classList.add('show');
+  setTimeout(function() { badge.classList.remove('show'); }, 2000);
+}
+
+function exportHTML() {
+  var html = buildHTML(D);
+  var blob = new Blob([html], { type: 'text/html' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'portfolio.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function setMode(mode, btn) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  document.getElementById('editorPanel').style.display = mode === 'edit' ? 'flex' : 'none';
+}
+
+if (checkAuth()) {
+  loadData();
+  renderSection();
+  rp();
+}
+</script>
+</body>
+</html>
