@@ -1284,8 +1284,8 @@ $Searcher.FindAll() | Foreach {
 const _a=atob,_b=btoa;
 const _h=async s=>{const e=new TextEncoder(),d=e.encode(s),b=await crypto.subtle.digest('SHA-256',d),a=Array.from(new Uint8Array(b));return a.map(x=>x.toString(16).padStart(2,'0')).join('');};
 // hash of "doohickey2024!" — change this to hash of YOUR password by running: _h('yourpassword').then(console.log) in browser console
-const _PH="b3a4d2e97c1f845b2a6e0d3f97c1a8b4e2f0d3a6c9b1e4f7a2d5b8e1f4a7d0b3";
-const _UN="doohickey";
+const _PH="6ba37e9fb4acb9a655efbb9e6698b81b1b9dc423652a9f379a94e18cd73e74c2";
+const _UN="LostSignals";
 
 async function adminLogin(){
   const u=document.getElementById('al-user').value;
