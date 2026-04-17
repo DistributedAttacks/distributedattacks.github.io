@@ -1027,10 +1027,10 @@ $Searcher.FindAll() | Foreach {
           <span class="sv-flash" id="sv-adm-home">saved</span>
           <hr style="border-color:var(--border);margin:1.5rem 0;">
           <div class="adm-ttl">jsonbin sync</div>
-          <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.8;">Connect a <a href="https://jsonbin.io" target="_blank" style="color:var(--blue);">JSONBin.io</a> bin so all admin changes sync across every browser instantly. <br>1. Create a free account at jsonbin.io &nbsp;2. Create a new bin &nbsp;3. Paste your API key and Bin ID below.</p>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.8;">The site has a public read-only access key baked in, so <b style="color:var(--green);">every visitor auto-pulls the latest content on page load</b>.<br>To make edits from this browser, enter your JSONBin <b>Master Key</b> below (used only for writing). The Bin ID is already configured but can be overridden.</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-            <div class="ef" style="margin:0;"><label>API key (X-Master-Key)</label><input type="password" id="jb-apikey" placeholder="$2b$10$..."></div>
-            <div class="ef" style="margin:0;"><label>Bin ID</label><input type="text" id="jb-binid" placeholder="64abc123..."></div>
+            <div class="ef" style="margin:0;"><label>Master Key (for writing only)</label><input type="password" id="jb-apikey" placeholder="$2b$10$..."></div>
+            <div class="ef" style="margin:0;"><label>Bin ID (override — leave blank for default)</label><input type="text" id="jb-binid" placeholder="69e2791736566621a8c49e94"></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <button class="sv-btn" onclick="saveJbCredentials()">save credentials</button>
@@ -2742,8 +2742,14 @@ function saveCmdPageTabs(page){
 // ═══════════════════════════════════════════════════════════════════
 const JB_BASE = 'https://api.jsonbin.io/v3';
 
+// ─── PUBLIC READ-ONLY ACCESS (baked into site — safe because read-only + single bin) ───
+const JB_PUBLIC_BIN = '69e2791736566621a8c49e94';
+const JB_PUBLIC_ACCESS_KEY = '$2a$10$GWmvwPX37llDIUxxND9vc.bRUz3O12eL1SqBOKR2GgX5z3F8mtZya';
+// This lets EVERY visitor auto-pull synced content with zero setup.
+// The master key (for writing) is still stored only in admin's localStorage.
+
 function jbKey(){return localStorage.getItem('jb_apikey')||'';}
-function jbBin(){return localStorage.getItem('jb_binid')||'';}
+function jbBin(){return localStorage.getItem('jb_binid')||JB_PUBLIC_BIN;}
 
 function setSyncDot(state){
   // state: 'ok' | 'err' | 'busy' | 'off'
@@ -2852,14 +2858,19 @@ async function pushToJb(silent){
 }
 
 // PULL from JSONBin and apply
+// Uses master key if admin is configured, otherwise falls back to public read-only access key.
+// This means every visitor automatically gets the latest content with zero setup.
 async function pullFromJb(silent){
-  const key=jbKey(),bin=jbBin();
-  if(!key||!bin){setSyncDot('off');return false;}
+  const bin=jbBin();
+  if(!bin){setSyncDot('off');return false;}
+  // Prefer master key (admin); fall back to public access key for visitors
+  const masterKey=jbKey();
+  const headers=masterKey
+    ?{'X-Master-Key':masterKey}
+    :{'X-Access-Key':JB_PUBLIC_ACCESS_KEY};
   setSyncDot('busy');
   try{
-    const res=await fetch(`${JB_BASE}/b/${bin}/latest`,{
-      headers:{'X-Master-Key':key},
-    });
+    const res=await fetch(`${JB_BASE}/b/${bin}/latest`,{headers});
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data=await res.json();
     const snap=data.record;
@@ -2888,9 +2899,10 @@ async function pullFromJb(silent){
 function saveJbCredentials(){
   const k=document.getElementById('jb-apikey')?.value.trim();
   const b=document.getElementById('jb-binid')?.value.trim();
-  if(!k||!b){jbStatus('Both API key and Bin ID are required.',true);return;}
+  if(!k){jbStatus('Master Key is required for writing.',true);return;}
   localStorage.setItem('jb_apikey',k);
-  localStorage.setItem('jb_binid',b);
+  if(b) localStorage.setItem('jb_binid',b);
+  else localStorage.removeItem('jb_binid'); // use default
   jbStatus('Credentials saved. Testing connection...');
   testJbConnection();
 }
@@ -2904,20 +2916,20 @@ function clearJbCredentials(){
 }
 async function testJbConnection(){
   const key=jbKey(),bin=jbBin();
-  if(!key||!bin){jbStatus('No credentials. Enter API key and Bin ID first.',true);return;}
+  if(!key){jbStatus('No Master Key. Enter one first.',true);return;}
   jbStatus('Testing...');
   setSyncDot('busy');
   try{
     const res=await fetch(`${JB_BASE}/b/${bin}/latest`,{headers:{'X-Master-Key':key}});
-    if(res.status===200){setSyncDot('ok');jbStatus('Connection successful. Bin is readable.');}
+    if(res.status===200){setSyncDot('ok');jbStatus('Connection successful. Master Key can read and write this bin.');}
     else if(res.status===404){
       // Bin exists but is empty — try creating initial content
       jbStatus('Bin appears empty. Pushing initial config...');
       const pushed=await pushToJb(true);
       if(pushed) jbStatus('Initial config pushed. Sync is ready.');
-      else jbStatus('Could not push initial config. Check your API key.',true);
+      else jbStatus('Could not push initial config. Check your Master Key.',true);
     } else {throw new Error('HTTP '+res.status);}
-  }catch(e){setSyncDot('err');jbStatus('Connection failed: '+e.message+'. Check your API key and Bin ID.',true);}
+  }catch(e){setSyncDot('err');jbStatus('Connection failed: '+e.message+'. Check your Master Key.',true);}
 }
 
 function loadJbCredentialsIntoAdminUI(){
@@ -2929,7 +2941,8 @@ function loadJbCredentialsIntoAdminUI(){
 
 // Auto-sync on page load
 async function jbAutoSync(){
-  if(!jbKey()||!jbBin()){setSyncDot('off');return;}
+  // Always try to pull — we have a public read-only access key for visitors,
+  // and master key fallback for admins.
   await pullFromJb(true);
 }
 
