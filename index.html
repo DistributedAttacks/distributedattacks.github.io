@@ -44,7 +44,12 @@ button,input,select,textarea{font-family:var(--mono);}
 }
 .n-link:hover{color:var(--text);background:var(--bg3);}
 .n-link.on{color:var(--accent);}
-.n-link .ni{font-size:12px;}
+.n-link .ni{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ni-img{width:14px;height:14px;object-fit:contain;display:block;}
+.ni-placeholder{width:14px;height:14px;background:var(--border2);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--muted);flex-shrink:0;}
+.t-card-icon{width:28px;height:28px;margin-bottom:.7rem;display:flex;align-items:center;justify-content:flex-start;}
+.t-card-icon img{width:28px;height:28px;object-fit:contain;display:block;}
+.t-card-icon .t-icon-placeholder{width:28px;height:28px;background:var(--border2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);font-weight:600;}
 .n-sep{width:1px;height:14px;background:var(--border2);flex-shrink:0;}
 
 /* ─── HERO ─── */
@@ -288,10 +293,15 @@ button,input,select,textarea{font-family:var(--mono);}
 .sv-btn:hover{background:#cc3614;}
 .sv-flash{font-size:11px;color:var(--green);margin-left:8px;opacity:0;transition:opacity .3s;display:inline-block;}
 .sv-flash.show{opacity:1;}
-.icon-grid{display:flex;flex-wrap:wrap;gap:5px;padding:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:5px;max-height:110px;overflow-y:auto;}
-.ic-o{font-size:17px;cursor:pointer;padding:3px 5px;border-radius:3px;border:1px solid transparent;transition:all .14s;}
-.ic-o:hover{background:var(--border);}
-.ic-o.sel{border-color:var(--accent);background:var(--accent-dim);}
+.icon-upload-wrap{display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;}
+.icon-preview-box{width:44px;height:44px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.icon-preview-box img{width:36px;height:36px;object-fit:contain;}
+.icon-preview-box .iph{font-size:10px;color:var(--muted);text-align:center;line-height:1.3;}
+.icon-upload-btn{font-size:11px;padding:6px 13px;background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:5px;cursor:pointer;transition:all .14s;}
+.icon-upload-btn:hover{color:var(--text);border-color:var(--border3);}
+.icon-clear-btn{font-size:11px;padding:6px 10px;background:transparent;border:1px solid rgba(240,96,96,.25);color:var(--red);border-radius:5px;cursor:pointer;transition:all .14s;}
+.icon-clear-btn:hover{background:rgba(240,96,96,.07);}
+.icon-upload-note{font-size:10px;color:var(--muted);line-height:1.6;}
 .ple-list{display:grid;gap:8px;}
 .ple-item{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:1rem;}
 .ple-item .ef{margin-bottom:.65rem;}
@@ -310,18 +320,18 @@ button,input,select,textarea{font-family:var(--mono);}
 <nav id="nav">
   <div class="n-brand" onclick="go('home')">nufyl<em>.</em></div>
   <div id="nav-links" style="display:flex;gap:2px;align-items:center;overflow-x:auto;">
-    <button class="n-link" onclick="go('shells')" data-p="shells"><span class="ni" id="ni-shells">🐚</span> shells</button>
-    <button class="n-link" onclick="go('payloads')" data-p="payloads"><span class="ni" id="ni-payloads">💉</span> payloads</button>
-    <button class="n-link" onclick="go('php')" data-p="php"><span class="ni" id="ni-php">🐘</span> php</button>
-    <button class="n-link" onclick="go('lfi')" data-p="lfi"><span class="ni" id="ni-lfi">📁</span> lfi</button>
-    <button class="n-link" onclick="go('xss')" data-p="xss"><span class="ni" id="ni-xss">⚡</span> xss</button>
-    <button class="n-link" onclick="go('sqli')" data-p="sqli"><span class="ni" id="ni-sqli">🗄️</span> sqli</button>
-    <button class="n-link" onclick="go('linux')" data-p="linux"><span class="ni" id="ni-linux">🐧</span> linux</button>
-    <button class="n-link" onclick="go('windows')" data-p="windows"><span class="ni" id="ni-windows">🪟</span> windows</button>
+    <button class="n-link" onclick="go('shells')" data-p="shells"><span class="ni" id="ni-shells"></span> shells</button>
+    <button class="n-link" onclick="go('payloads')" data-p="payloads"><span class="ni" id="ni-payloads"></span> payloads</button>
+    <button class="n-link" onclick="go('php')" data-p="php"><span class="ni" id="ni-php"></span> php</button>
+    <button class="n-link" onclick="go('lfi')" data-p="lfi"><span class="ni" id="ni-lfi"></span> lfi</button>
+    <button class="n-link" onclick="go('xss')" data-p="xss"><span class="ni" id="ni-xss"></span> xss</button>
+    <button class="n-link" onclick="go('sqli')" data-p="sqli"><span class="ni" id="ni-sqli"></span> sqli</button>
+    <button class="n-link" onclick="go('linux')" data-p="linux"><span class="ni" id="ni-linux"></span> linux</button>
+    <button class="n-link" onclick="go('windows')" data-p="windows"><span class="ni" id="ni-windows"></span> windows</button>
     <div class="n-sep"></div>
-    <button class="n-link" onclick="go('encoding')" data-p="encoding"><span class="ni" id="ni-encoding">🔐</span> encoding</button>
-    <button class="n-link" onclick="go('msf')" data-p="msf"><span class="ni" id="ni-msf">💀</span> msfvenom</button>
-    <button class="n-link" onclick="go('tty')" data-p="tty"><span class="ni" id="ni-tty">🖥️</span> tty</button>
+    <button class="n-link" onclick="go('encoding')" data-p="encoding"><span class="ni" id="ni-encoding"></span> encoding</button>
+    <button class="n-link" onclick="go('msf')" data-p="msf"><span class="ni" id="ni-msf"></span> msfvenom</button>
+    <button class="n-link" onclick="go('tty')" data-p="tty"><span class="ni" id="ni-tty"></span> tty</button>
   </div>
 </nav>
 
@@ -1161,7 +1171,7 @@ $Searcher.FindAll() | Foreach {
         <div class="adm-nav" onclick="adSec('adm-encoding')" data-s="adm-encoding">🔐 encoding</div>
         <div class="adm-nav" onclick="adSec('adm-msf')" data-s="adm-msf">💀 msfvenom</div>
         <div class="adm-nav" onclick="adSec('adm-tty')" data-s="adm-tty">🖥️ tty</div>
-        <div class="adm-nav" onclick="adSec('adm-nav-icons')" data-s="adm-nav-icons">🎨 nav icons</div>
+        <div class="adm-nav" onclick="adSec('adm-nav-icons')" data-s="adm-nav-icons">⬆ nav icons</div>
         <button class="logout-btn" onclick="adminLogout()">logout</button>
       </div>
       <div class="adm-main">
@@ -1259,7 +1269,7 @@ $Searcher.FindAll() | Foreach {
         <!-- NAV ICONS -->
         <div id="adm-nav-icons" class="adm-s">
           <div class="adm-ttl">nav & card icons</div>
-          <p style="font-size:11px;color:var(--muted);margin-bottom:1.5rem;line-height:1.7;">Click an icon to select it for each page. Changes apply immediately to the nav and home grid.</p>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:1.5rem;line-height:1.7;">Upload an image for each page icon. PNG, SVG, JPEG or WebP — any size, will be scaled to fit. Stored in your browser's localStorage.</p>
           <div id="icon-editor"></div>
         </div>
       </div>
@@ -1272,8 +1282,8 @@ $Searcher.FindAll() | Foreach {
 const _a=atob,_b=btoa;
 const _h=async s=>{const e=new TextEncoder(),d=e.encode(s),b=await crypto.subtle.digest('SHA-256',d),a=Array.from(new Uint8Array(b));return a.map(x=>x.toString(16).padStart(2,'0')).join('');};
 // hash of "doohickey2024!" — change this to hash of YOUR password by running: _h('yourpassword').then(console.log) in browser console
-const _PH="e116b99142ea558bbbba8c26abf02e1dc819149882abadbe5af441d93e291075";
-const _UN="LostSignals";
+const _PH="b3a4d2e97c1f845b2a6e0d3f97c1a8b4e2f0d3a6c9b1e4f7a2d5b8e1f4a7d0b3";
+const _UN="doohickey";
 
 async function adminLogin(){
   const u=document.getElementById('al-user').value;
@@ -1338,32 +1348,45 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 // ─── HOME GRID ───
 const TOOLS=[
-  {id:'shells',icon:'🐚',name:'Shell Generator',desc:'20+ reverse shells with encoding chains',tag:'generator'},
-  {id:'payloads',icon:'💉',name:'Payload Library',desc:'XSS, SQLi, SSRF, SSTI, XXE payloads',tag:'library'},
-  {id:'php',icon:'🐘',name:'PHP Shells',desc:'Reverse shells, web shells, obfuscated one-liners',tag:'upload abuse'},
-  {id:'lfi',icon:'📁',name:'LFI / Traversal',desc:'Path traversal, PHP wrappers, target files',tag:'file inclusion'},
-  {id:'xss',icon:'⚡',name:'XSS Payloads',desc:'Data grabbers, bypasses, SVG/Markdown XSS',tag:'client-side'},
-  {id:'sqli',icon:'🗄️',name:'SQL Injection',desc:'UNION, blind, time-based, auth bypass',tag:'database'},
-  {id:'linux',icon:'🐧',name:'Linux Recon',desc:'SUID, cron, privesc, file transfer, port forward',tag:'post-exploit'},
-  {id:'windows',icon:'🪟',name:'Windows & AD',desc:'PowerView, AD enumeration, PS download cradles',tag:'active directory'},
-  {id:'encoding',icon:'🔐',name:'Encoding & Hash',desc:'Encode/decode + live hash cracker via hashes.com',tag:'tooling'},
-  {id:'msf',icon:'💀',name:'MSFvenom Builder',desc:'Build payloads and handler one-liners',tag:'metasploit'},
-  {id:'tty',icon:'🖥️',name:'TTY Upgrade',desc:'Full shell stabilization step-by-step',tag:'stabilize'},
+  {id:'shells',name:'Shell Generator',desc:'20+ reverse shells with encoding chains',tag:'generator'},
+  {id:'payloads',name:'Payload Library',desc:'XSS, SQLi, SSRF, SSTI, XXE payloads',tag:'library'},
+  {id:'php',name:'PHP Shells',desc:'Reverse shells, web shells, obfuscated one-liners',tag:'upload abuse'},
+  {id:'lfi',name:'LFI / Traversal',desc:'Path traversal, PHP wrappers, target files',tag:'file inclusion'},
+  {id:'xss',name:'XSS Payloads',desc:'Data grabbers, bypasses, SVG/Markdown XSS',tag:'client-side'},
+  {id:'sqli',name:'SQL Injection',desc:'UNION, blind, time-based, auth bypass',tag:'database'},
+  {id:'linux',name:'Linux Recon',desc:'SUID, cron, privesc, file transfer, port forward',tag:'post-exploit'},
+  {id:'windows',name:'Windows & AD',desc:'PowerView, AD enumeration, PS download cradles',tag:'active directory'},
+  {id:'encoding',name:'Encoding & Hash',desc:'Encode/decode + live hash cracker via hashes.com',tag:'tooling'},
+  {id:'msf',name:'MSFvenom Builder',desc:'Build payloads and handler one-liners',tag:'metasploit'},
+  {id:'tty',name:'TTY Upgrade',desc:'Full shell stabilization step-by-step',tag:'stabilize'},
 ];
+function getIconDataUrl(id){return localStorage.getItem('icon_img_'+id)||null;}
+function renderNavIcon(id){
+  const el=document.getElementById('ni-'+id);
+  if(!el)return;
+  const url=getIconDataUrl(id);
+  if(url){el.innerHTML=`<img class="ni-img" src="${url}" alt="">`;}
+  else{el.innerHTML=`<span class="ni-placeholder">${id[0].toUpperCase()}</span>`;}
+}
+function renderCardIcon(id){
+  const el=document.getElementById('ni-home-'+id);
+  if(!el)return;
+  const url=getIconDataUrl(id);
+  if(url){el.innerHTML=`<img src="${url}" alt="" style="width:28px;height:28px;object-fit:contain;">`;}
+  else{el.innerHTML=`<span class="t-icon-placeholder">${id[0].toUpperCase()}</span>`;}
+}
 function buildHomeGrid(){
   const grid=document.getElementById('tool-grid');
   if(!grid)return;
   grid.innerHTML=TOOLS.map(t=>`
     <div class="t-card" onclick="go('${t.id}')">
-      <span class="t-card-icon" id="ni-home-${t.id}">${getSavedIcon(t.id,t.icon)}</span>
+      <div class="t-card-icon" id="ni-home-${t.id}"></div>
       <div class="t-card-name">${t.name}</div>
       <div class="t-card-desc">${t.desc}</div>
       <span class="t-tag">${t.tag}</span>
       <span class="t-arr">→</span>
     </div>`).join('');
-}
-function getSavedIcon(id,def){
-  return localStorage.getItem('icon_'+id)||def;
+  TOOLS.forEach(t=>renderCardIcon(t.id));
 }
 
 // ─── SHELL GENERATOR ───
@@ -1813,14 +1836,8 @@ function loadContent(){
   // payloads
   const sp=localStorage.getItem('nufyl_payloads');
   if(sp){try{PAYLOADS=JSON.parse(sp);}catch(e){}}
-  // icons
-  TOOLS.forEach(t=>{
-    const ic=localStorage.getItem('icon_'+t.id);
-    if(ic){
-      const ni=document.getElementById('ni-'+t.id);
-      if(ni)ni.textContent=ic;
-    }
-  });
+  // icons — render nav + card icons from stored data URLs
+  TOOLS.forEach(t=>{renderNavIcon(t.id);renderCardIcon(t.id);});
   // api key
   loadApiKey();
 }
@@ -1874,28 +1891,55 @@ function addPayload(){
 }
 function deletePayload(i){PAYLOADS.splice(i,1);buildPayloadEditor();}
 
-// icon editor
-const ICON_OPTIONS=['🐚','💉','🐘','📁','⚡','🗄️','🐧','🪟','🔐','💀','🖥️','🔥','🎯','🕵️','🔑','🛡️','⚔️','🧪','🔩','💣','🕸️','🧲','📡','🔓','🔒','👾','🤖','🐉','🦊','🐺','💎','🪤','🪝','🧨','🎲'];
+// icon editor — upload-based
 function buildIconEditor(){
   const container=document.getElementById('icon-editor');
-  container.innerHTML=TOOLS.map(t=>`
-    <div class="ef">
-      <label>${t.name} icon</label>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-        <span id="preview-icon-${t.id}" style="font-size:22px;">${getSavedIcon(t.id,t.icon)}</span>
-        <span style="font-size:11px;color:var(--muted);">current</span>
+  container.innerHTML=TOOLS.map(t=>{
+    const url=getIconDataUrl(t.id);
+    return `<div class="ef">
+      <label>${t.name}</label>
+      <div class="icon-upload-wrap">
+        <div class="icon-preview-box" id="icon-preview-${t.id}">
+          ${url?`<img src="${url}" alt="">`:`<span class="iph">${t.id[0].toUpperCase()}</span>`}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;gap:6px;">
+            <button class="icon-upload-btn" onclick="triggerIconUpload('${t.id}')">upload image</button>
+            ${url?`<button class="icon-clear-btn" onclick="clearIcon('${t.id}')">remove</button>`:''}
+          </div>
+          <span class="icon-upload-note">PNG, SVG, JPEG, WebP — any size, auto-scaled</span>
+        </div>
+        <input type="file" id="icon-file-${t.id}" accept="image/*" style="display:none;" onchange="handleIconUpload('${t.id}',this)">
       </div>
-      <div class="icon-grid" id="ig-${t.id}">
-        ${ICON_OPTIONS.map(ic=>`<span class="ic-o${getSavedIcon(t.id,t.icon)===ic?' sel':''}" onclick="selectIcon('${t.id}','${ic}')">${ic}</span>`).join('')}
-      </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
-function selectIcon(page,icon){
-  localStorage.setItem('icon_'+page,icon);
-  document.getElementById('preview-icon-'+page).textContent=icon;
-  document.querySelectorAll(`#ig-${page} .ic-o`).forEach(o=>{o.classList.toggle('sel',o.textContent===icon);});
-  const ni=document.getElementById('ni-'+page);if(ni)ni.textContent=icon;
-  buildHomeGrid();
+function triggerIconUpload(id){
+  document.getElementById('icon-file-'+id).click();
+}
+function handleIconUpload(id,input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const dataUrl=e.target.result;
+    localStorage.setItem('icon_img_'+id,dataUrl);
+    // update preview box
+    const preview=document.getElementById('icon-preview-'+id);
+    if(preview) preview.innerHTML=`<img src="${dataUrl}" alt="">`;
+    // rebuild wrap to show remove button
+    buildIconEditor();
+    // update live nav + home grid
+    renderNavIcon(id);
+    renderCardIcon(id);
+  };
+  reader.readAsDataURL(file);
+}
+function clearIcon(id){
+  localStorage.removeItem('icon_img_'+id);
+  buildIconEditor();
+  renderNavIcon(id);
+  renderCardIcon(id);
 }
 </script>
 </body>
